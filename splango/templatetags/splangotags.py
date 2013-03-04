@@ -54,10 +54,12 @@ class HypNode(template.Node):
         else:
             return ""
 
-        return "[%s==%s]"%(self.exp_variant, context[ctxvar])+self.nodelist.render(context)+"[/%s]"%self.exp_variant
+        # TODO: cleanup these old returns, which can't be reached
+        # return "[%s==%s]"%(self.exp_variant, context[ctxvar])+self.nodelist.render(context)+"[/%s]"%self.exp_variant
+        # 
+        # return "HypNode: exp_name=%s, exp_variant=%s" % (self.exp_name,
+        #                                                  self.exp_variant)
 
-        return "HypNode: exp_name=%s, exp_variant=%s" % (self.exp_name,
-                                                         self.exp_variant)
     
 
 

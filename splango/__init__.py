@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 from .models import Subject, Experiment, Enrollment, GoalRecord
+from .utils import replace_insensitive
 
 
 logger = logging.getLogger(__name__)
@@ -17,21 +18,6 @@ S_HUMAN = "HUMAN"
 
 # borrowed from debug_toolbar
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
-
-
-def replace_insensitive(string, target, replacement):
-    """Similar to string.replace() but is case insensitive
-
-    Code borrowed from ``debug_toolbar`` and
-    http://forums.devshed.com/python-programming-11/case-insensitive-string-replace-490921.html
-
-    """
-    no_case = string.lower()
-    index = no_case.rfind(target.lower())
-    if index >= 0:
-        return string[:index] + replacement + string[index + len(target):]
-    else:  # no results so return the original string
-        return string
 
 
 class RequestExperimentManager:

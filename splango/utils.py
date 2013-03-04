@@ -16,3 +16,33 @@ def replace_insensitive(string, target, replacement):
         return string[:index] + replacement + string[index + len(target):]
     else:  # no results so return the original string
         return string
+
+
+def is_first_visit(request):
+    """Tell whether it is the first visit by ``request``'s visitor.
+
+    Current algorithm is very basic. It performs the following nested checks:
+    * if ``user`` in ``request`` is authenticated
+    * if there is a HTTP_REFERER
+    * if ``request``'s host matches the referer
+
+    :param request: HTTP request
+    :type request: :class:`django.http.HttpRequest`
+    :return: True if this ``request`` is the first one by ``request``'s visitor
+    :rtype: bool
+
+    """
+    if request.user.is_authenticated():
+        return False
+
+    ref = request.META.get("HTTP_REFERER", "").lower()
+
+    if not ref:  # if no referer, then musta just typed it in
+        return True
+
+    if ref.startswith("http://"):
+        ref = ref[7:]
+    elif ref.startswith("https://"):
+        ref = ref[8:]
+
+    return not(ref.startswith(request.get_host()))

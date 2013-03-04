@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 from .models import Subject, Experiment, Enrollment, GoalRecord
-from .utils import replace_insensitive
+from .utils import is_first_visit, replace_insensitive
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class RequestExperimentManager:
         if self.request.session.get(SPLANGO_STATE) is None:
             self.request.session[SPLANGO_STATE] = S_UNKNOWN
 
-            if self.is_first_visit():
+            if is_first_visit(self.request):
                 logger.info("First visit!")
 
                 first_visit_goalname = getattr(
@@ -61,24 +61,6 @@ class RequestExperimentManager:
 
         else:
             raise RuntimeError("Unknown queue action '%s'." % action)
-
-    def is_first_visit(self):
-        r = self.request
-
-        if r.user.is_authenticated():
-            return False
-
-        ref = r.META.get("HTTP_REFERER", "").lower()
-
-        if not ref:  # if no referer, then musta just typed it in
-            return True
-
-        if ref.startswith("http://"):
-            ref = ref[7:]
-        elif ref.startswith("https://"):
-            ref = ref[8:]
-
-        return not(ref.startswith(r.get_host()))
 
     def render_js(self):
         logger.info("render_js")

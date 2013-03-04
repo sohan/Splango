@@ -1,10 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User
-
 import logging
 import random
 
-#from django.db.models import Avg, Max, Min, Count
+from django.db import models
+from django.contrib.auth.models import User
 
 
 _NAME_LENGTH = 30

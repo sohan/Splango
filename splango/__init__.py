@@ -1,10 +1,10 @@
-from django.conf import settings
-
 import logging
+
 from django.utils.encoding import smart_unicode
+from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-from splango.models import Subject, Experiment, Enrollment, GoalRecord
+from .models import Subject, Experiment, Enrollment, GoalRecord
 
 
 SPLANGO_STATE = "SPLANGO_STATE"

@@ -1,7 +1,8 @@
 from django.contrib import admin
 
-from splango.models import (Subject, Goal, GoalRecord, Enrollment, Experiment,
-                            ExperimentReport)
+from .models import (Subject, Goal, GoalRecord, Enrollment, Experiment,
+                     ExperimentReport)
+
 
 admin.site.register(Subject)
 

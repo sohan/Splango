@@ -1,13 +1,7 @@
 from django import template
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
 
-import logging
 
 register = template.Library()
-
-
-from splango.models import Goal, Subject, GoalRecord, Enrollment, Experiment, ExperimentReport
 
 CTX_PREFIX = "__splango__experiment__"
 

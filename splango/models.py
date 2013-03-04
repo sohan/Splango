@@ -5,6 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+logger = logging.getLogger(__name__)
+
 _NAME_LENGTH = 30
 
 
@@ -88,8 +90,7 @@ class GoalRecord(models.Model):
 
     @classmethod
     def record(cls, subject, goalname, request_info, extra=None):
-        logging.warn("Splango:goalrecord %r" %
-                     [subject, goalname, request_info, extra])
+        logger.warn("goalrecord %r" % [subject, goalname, request_info, extra])
         goal, created = Goal.objects.get_or_create(name=goalname)
 
         gr, created = cls.objects.get_or_create(
@@ -219,7 +220,7 @@ class ExperimentReport(models.Model):
             try:
                 g = Goal.objects.get(name=goal)
             except Goal.DoesNotExist:
-                logging.warn("Splango: No such goal <<%s>>." % goal)
+                logger.warn("No such goal <<%s>>." % goal)
                 g = None
 
             variant_counts = []

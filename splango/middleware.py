@@ -1,5 +1,6 @@
 from splango import RequestExperimentManager
 
+
 class ExperimentsMiddleware:
 
     def process_request(self, request):

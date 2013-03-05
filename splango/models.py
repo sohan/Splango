@@ -12,6 +12,8 @@ _NAME_LENGTH = 30
 
 class Goal(models.Model):
 
+    """An experiment goal, that is what we are waiting to happen."""
+
     name = models.CharField(max_length=_NAME_LENGTH, primary_key=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -66,6 +68,8 @@ class Subject(models.Model):
 
 
 class GoalRecord(models.Model):
+
+    """Relates the goal reached by the subject."""
 
     goal = models.ForeignKey(Goal)
     subject = models.ForeignKey(Subject)

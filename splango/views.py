@@ -9,12 +9,14 @@ from .models import Enrollment, Experiment, ExperimentReport, Goal, GoalRecord
 
 @never_cache
 def confirm_human(request):
+    """Confirms that is a human who is running the experiment, not a bot."""
     request.experiments_manager.confirm_human()
     return HttpResponse(status=204)
 
 
 @staff_member_required
 def experiments_overview(request):
+    """Shows experiments list."""
     experiments = Experiment.objects.all()
     reports = ExperimentReport.objects.all()
     reports_by_id = dict()
@@ -32,6 +34,7 @@ def experiments_overview(request):
 
 @staff_member_required
 def experiment_detail(request, exp_name):
+    """Shows the experiment and its reports."""
     exp = get_object_or_404(Experiment, name=exp_name)
     reports = ExperimentReport.objects.filter(experiment=exp)
 
@@ -43,6 +46,10 @@ def experiment_detail(request, exp_name):
 
 @staff_member_required
 def experiment_report(request, exp_name, report_id):
+    """Shows the experiment report."""
+    # Is really necessary ``exp_name`` as a param? An ExperimentReport already
+    # has an experiment as a field.
+
     report = get_object_or_404(ExperimentReport, id=report_id,
                                experiment__name=exp_name)
     report_rows = report.generate()
@@ -55,6 +62,15 @@ def experiment_report(request, exp_name, report_id):
 
 @staff_member_required
 def experiment_log(request, exp_name, variant, goal):
+    """This is what shows an enrollment, that dentifies which variant a
+    subject is assigned to in a given experiment.
+
+    In the response, it returns the experiment itself; the activities, that
+    shows what goals reached by the subject, with the given variant, and the
+    title, that shows the activity in string format.
+
+    :return: The experiment log response
+    """
     exp = get_object_or_404(Experiment, name=exp_name)
     goal = get_object_or_404(Goal, name=goal)
 

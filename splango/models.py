@@ -37,27 +37,27 @@ class Subject(models.Model):
 
         return u"%s subject #%d" % (prefix, self.id)
 
-    def merge_into(self, othersubject):
-        """Move the enrollments and goalrecords associated with this subject
-        into the given othersubject, preserving the othersubject's
+    def merge_into(self, other_subject):
+        """Move the enrollments and goal records associated with this subject
+        into ``other_subject``, preserving ``other_subject``'s
         enrollments in case of conflict.
 
         """
-        other_gs = dict(((g.name, 1) for g in othersubject.goals.all()))
+        other_goals = dict(((g.name, 1) for g in other_subject.goals.all()))
 
-        for gr in self.goalrecord_set.all().select_related("goal"):
-            if gr.goal.name not in other_gs:
-                gr.subject = othersubject
-                gr.save()
+        for goal_record in self.goalrecord_set.all().select_related("goal"):
+            if goal_record.goal.name not in other_goals:
+                goal_record.subject = other_subject
+                goal_record.save()
             else:
-                gr.delete()
+                goal_record.delete()
 
         other_exps = dict(((e.experiment_id, 1)
-                           for e in othersubject.enrollment_set.all()))
+                           for e in other_subject.enrollment_set.all()))
 
         for e in self.enrollment_set.all():
             if e.experiment_id not in other_exps:
-                e.subject = othersubject
+                e.subject = other_subject
                 e.save()
             else:
                 e.delete()
@@ -89,24 +89,24 @@ class GoalRecord(models.Model):
             req_path=request.path[:255])
 
     @classmethod
-    def record(cls, subject, goalname, request_info, extra=None):
-        logger.warn("goalrecord %r" % [subject, goalname, request_info, extra])
-        goal, created = Goal.objects.get_or_create(name=goalname)
-
-        gr, created = cls.objects.get_or_create(
+    def record(cls, subject, goal_name, request_info, extra=None):
+        logger.warn("goal_record %r" %
+                    [subject, goal_name, request_info, extra])
+        goal, created = Goal.objects.get_or_create(name=goal_name)
+        goal_record, created = cls.objects.get_or_create(
             subject=subject, goal=goal, defaults=request_info)
 
-        if not created and not gr.extra and extra:
+        if not created and not goal_record.extra and extra:
             # add my extra info to the existing goal record
-            gr.extra = extra
-            gr.save()
+            goal_record.extra = extra
+            goal_record.save()
 
-        return gr
+        return goal_record
 
     @classmethod
-    def record_user_goal(cls, user, goalname):
-        sub, created = Subject.objects.get_or_create(registered_as=user)
-        cls.record(sub, goalname, {})
+    def record_user_goal(cls, user, goal_name):
+        subject, created = Subject.objects.get_or_create(registered_as=user)
+        cls.record(subject, goal_name, {})
 
     def __unicode__(self):
         return u"%s by subject #%d" % (self.goal, self.subject_id)
@@ -143,8 +143,8 @@ class Experiment(models.Model):
     def __unicode__(self):
         return self.name
 
-    def set_variants(self, variantlist):
-        self.variants = "\n".join(variantlist)
+    def set_variants(self, variant_list):
+        self.variants = "\n".join(variant_list)
 
     def get_variants(self):
         return [x for x in self.variants.split("\n") if x]
@@ -156,24 +156,24 @@ class Experiment(models.Model):
         return ",".join(self.get_variants())
 
     def get_variant_for(self, subject):
-        sv, created = Enrollment.objects.get_or_create(
+        enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,
             defaults={"variant": self.get_random_variant(), })
-        return sv
+        return enrollment
 
     def enroll_subject_as_variant(self, subject, variant):
-        sv, created = Enrollment.objects.get_or_create(
+        enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,
             defaults={"variant": variant, })
-        return sv
+        return enrollment
 
     @classmethod
     def declare(cls, name, variants):
-        e, created = cls.objects.get_or_create(
+        obj, created = cls.objects.get_or_create(
             name=name, defaults={"variants": "\n".join(variants), })
-        return e
+        return obj
 
 
 class ExperimentReport(models.Model):
@@ -218,17 +218,17 @@ class ExperimentReport(models.Model):
 
         for previ, goal in enumerate(goals):
             try:
-                g = Goal.objects.get(name=goal)
+                goal = Goal.objects.get(name=goal)
             except Goal.DoesNotExist:
                 logger.warn("No such goal <<%s>>." % goal)
-                g = None
+                goal = None
 
             variant_counts = []
 
             for vi, v in enumerate(variants):
-                if g:
+                if goal:
                     vcount = Enrollment.objects.filter(
-                        experiment=exp, variant=v, subject__goals=g).count()
+                        experiment=exp, variant=v, subject__goals=goal).count()
                     prev_count = result[previ]["variant_counts"][vi]["val"]
 
                     if prev_count == 0:

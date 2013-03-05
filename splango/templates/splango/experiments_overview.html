@@ -16,11 +16,11 @@
 {% if exps %}
 <ul>
   {% for exp in exps %}
-  <li><a href="{% url splango-experiment-detail expname=exp.name %}">{{exp}}</a>
+  <li><a href="{% url splango-experiment-detail exp_name=exp.name %}">{{exp}}</a>
     {% if exp.reports %}
     <ul>
       {% for rept in exp.reports %}
-      <li><a href="{% url splango-experiment-report expname=exp.name report_id=rept.id %}">{{rept.title}}</a></li>
+      <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=rept.id %}">{{rept.title}}</a></li>
       {% endfor %}
     </ul>
     {% endif %}

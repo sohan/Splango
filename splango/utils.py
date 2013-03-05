@@ -35,14 +35,14 @@ def is_first_visit(request):
     if request.user.is_authenticated():
         return False
 
-    ref = request.META.get("HTTP_REFERER", "").lower()
+    referer = request.META.get("HTTP_REFERER", "").lower()
 
-    if not ref:  # if no referer, then musta just typed it in
+    if not referer:  # if no referer, then musta just typed it in
         return True
 
-    if ref.startswith("http://"):
-        ref = ref[7:]
-    elif ref.startswith("https://"):
-        ref = ref[8:]
+    if referer.startswith("http://"):
+        referer = referer[7:]
+    elif referer.startswith("https://"):
+        referer = referer[8:]
 
-    return not(ref.startswith(request.get_host()))
+    return not(referer.startswith(request.get_host()))

@@ -28,18 +28,18 @@ class ExperimentNode(template.Node):
                 "add splango.middleware.ExperimentsMiddleware to your "
                 "settings.MIDDLEWARE_CLASSES.")
 
-        expvariant = exp.declare_and_enroll(self.exp_name, self.variants)
-        context[CTX_PREFIX + self.exp_name] = expvariant
+        exp_variant = exp.declare_and_enroll(self.exp_name, self.variants)
+        context[CTX_PREFIX + self.exp_name] = exp_variant
 
-        return ""  # "exp: %s - you are %s" % (self.exp_name, expvariant)
+        return ""  # "exp: %s - you are %s" % (self.exp_name, exp_variant)
 
 
 class HypNode(template.Node):
 
-    def __init__(self, exp_name, exp_variant, nodelist):
+    def __init__(self, exp_name, exp_variant, node_list):
         self.exp_name = exp_name
         self.exp_variant = exp_variant
-        self.nodelist = nodelist
+        self.node_list = node_list
 
 #         print ' ++ instantiated HypNode (%s, %s)' % (self.exp_name,
 #                                                      self.exp_variant)
@@ -48,21 +48,21 @@ class HypNode(template.Node):
 #         print ' == rendering HypNode (%s, %s)' % (self.exp_name,
 #                                                   self.exp_variant)
 
-        ctxvar = CTX_PREFIX + self.exp_name
+        ctx_var = CTX_PREFIX + self.exp_name
 
-        if ctxvar not in context:
+        if ctx_var not in context:
             raise template.TemplateSyntaxError(
                 "Experiment %s has not yet been declared. Please declare it "
                 "and supply variant names using an experiment tag before "
                 "using hyp tags.")
 
-        if self.exp_variant == context[ctxvar]:
-            return self.nodelist.render(context)
+        if self.exp_variant == context[ctx_var]:
+            return self.node_list.render(context)
         else:
             return ""
 
         # TODO: cleanup these old returns, which can't be reached
-        # return "[%s==%s]"%(self.exp_variant, context[ctxvar])+self.nodelist.render(context)+"[/%s]"%self.exp_variant
+        # return "[%s==%s]"%(self.exp_variant, context[ctx_var])+self.node_list.render(context)+"[/%s]"%self.exp_variant
         # 
         # return "HypNode: exp_name=%s, exp_variant=%s" % (self.exp_name,
         #                                                  self.exp_variant)
@@ -93,14 +93,14 @@ def hyp(parser, token):
 #     print "*** hyp looking for next tag"
     #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
 
-    nodelist = parser.parse(("endhyp",))
+    node_list = parser.parse(("endhyp",))
     token = parser.next_token()
 
 #     print " * hyp FOUND TOKEN %s" % token.contents
     parser.delete_first_token()
     #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
 
-    return HypNode(exp_name.strip("\"'"), exp_variant.strip("\"'"), nodelist)
+    return HypNode(exp_name.strip("\"'"), exp_variant.strip("\"'"), node_list)
 
 
 # I couldn't make this work well. Probably needs much more thought to work like
@@ -120,6 +120,6 @@ def hyp(parser, token):
 #     print "*** elsehyp looking for next tag"
 #     #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
 
-#     nodelist = parser.parse(("elsehyp","endhyp"))
+#     node_list = parser.parse(("elsehyp","endhyp"))
 
-#     return HypNode(None, exp_variant, nodelist)
+#     return HypNode(None, exp_variant, node_list)

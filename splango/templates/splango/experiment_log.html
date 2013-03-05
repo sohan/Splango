@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url splango-admin %}">Splango</a>
 
-&rsaquo; <a href="{% url splango-experiment-detail expname=exp.name %}">{{exp.name}}</a>
+&rsaquo; <a href="{% url splango-experiment-detail exp_name=exp.name %}">{{exp.name}}</a>
 
 {% if title %} &rsaquo; {{ title }}{% endif %}
 </div>{% endblock %}

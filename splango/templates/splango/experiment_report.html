@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url splango-admin %}">Splango</a>
 
-&rsaquo; <a href="{% url splango-experiment-detail expname=exp.name %}">{{exp.name}}</a>
+&rsaquo; <a href="{% url splango-experiment-detail exp_name=exp.name %}">{{exp.name}}</a>
 
 {% if title %} &rsaquo; {{ title }}{% endif %}
 </div>{% endblock %}
@@ -29,7 +29,7 @@
     </th>
     {% for variantct in row.variant_counts %}
     <td style="border-left:1px solid #ccc">
-      <a style="text-decoration:none" href="{% url splango-experiment-log expname=exp.name variant=variantct.variant_name goal=row.goal %}">{{variantct.val}}</a>
+      <a style="text-decoration:none" href="{% url splango-experiment-log exp_name=exp.name variant=variantct.variant_name goal=row.goal %}">{{variantct.val}}</a>
     </td>
     <td>
       {% if variantct.pct %}<i>({{variantct.pct_round}}%)</i>

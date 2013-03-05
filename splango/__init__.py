@@ -34,11 +34,12 @@ class RequestExperimentManager:
             if is_first_visit(self.request):
                 logger.info("First visit!")
 
-                first_visit_goalname = getattr(
+                first_visit_goal_name = getattr(
                     settings, "SPLANGO_FIRST_VISIT_GOAL", None)
 
-                if first_visit_goalname:
-                    self.log_goal(first_visit_goalname)
+                # TODO: shouldn't this be ``if first_visit_goal_name is None``?
+                if first_visit_goal_name:
+                    self.log_goal(first_visit_goal_name)
 
     def enqueue(self, action, params):
         self.queued_actions.append((action, params))
@@ -52,12 +53,11 @@ class RequestExperimentManager:
                                           params["variant"])
 
         elif action == "log_goal":
-            g = GoalRecord.record(self.get_subject(),
-                                  params["goal_name"],
-                                  params["request_info"],
-                                  extra=params.get("extra"))
-
-            logger.info("goal! %s" % str(g))
+            goal_record = GoalRecord.record(self.get_subject(),
+                                            params["goal_name"],
+                                            params["request_info"],
+                                            extra=params.get("extra"))
+            logger.info("goal! %s" % str(goal_record))
 
         else:
             raise RuntimeError("Unknown queue action '%s'." % action)
@@ -65,16 +65,16 @@ class RequestExperimentManager:
     def render_js(self):
         logger.info("render_js")
 
-        prejs = ""
-        postjs = ""
+        pre_js = ""
+        post_js = ""
 
         if settings.DEBUG:
-            prejs = "try { "
-            postjs = (' } catch(e) { alert("DEBUG notice: Splango encountered '
-                      'a javascript error when attempting to confirm this '
-                      'user as a human. Is jQuery loaded?\\n\\nYou may notice '
-                      'inconsistent experiment enrollments until this is '
-                      'fixed.\\n\\nDetails:\\n"+e.toString()); }')
+            pre_js = "try { "
+            post_js = (' } catch(e) { alert("DEBUG notice: Splango encountered '
+                       'a javascript error when attempting to confirm this '
+                       'user as a human. Is jQuery loaded?\\n\\nYou may notice '
+                       'inconsistent experiment enrollments until this is '
+                       'fixed.\\n\\nDetails:\\n"+e.toString()); }')
 
         try:
             url = reverse("splango-confirm-human")
@@ -83,7 +83,7 @@ class RequestExperimentManager:
 
         return ("<script type='text/javascript'>"
                 "%sjQuery.get(\"%s\");"
-                "%s</script>" % (prejs, url, postjs))
+                "%s</script>" % (pre_js, url, post_js))
 
     def confirm_human(self, reqdata=None):
         logger.info("Human confirmed!")
@@ -94,17 +94,17 @@ class RequestExperimentManager:
             self.process_from_queue(action, params)
 
     def finish(self, response):
-        curstate = self.request.session.get(SPLANGO_STATE, S_UNKNOWN)
+        current_state = self.request.session.get(SPLANGO_STATE, S_UNKNOWN)
 
-        #logger.info("finished... state=%s" % curstate)
+        #logger.info("finished... state=%s" % current_state)
 
-        curuser = self.request.user
+        current_user = self.request.user
 
-        if self.user_at_init != curuser:
+        if self.user_at_init != current_user:
             logger.info("user status changed over request: %s --> %s"
-                        % (str(self.user_at_init), str(curuser)))
+                        % (str(self.user_at_init), str(current_user)))
 
-            if not(curuser.is_authenticated()):
+            if not(current_user.is_authenticated()):
                 # User logged out. It's a new session, nothing special.
                 pass
             else:
@@ -120,7 +120,7 @@ class RequestExperimentManager:
 
                 try:
                     existing_subject = Subject.objects.get(
-                        registered_as=curuser)
+                        registered_as=current_user)
                     # there is an existing registered subject!
                     if old_subject and old_subject.id != existing_subject.id:
                         # merge old subject's activity into new
@@ -132,11 +132,11 @@ class RequestExperimentManager:
 
                 except Subject.DoesNotExist:
                     # promote current subject to registered!
-                    sub = self.get_subject()
-                    sub.registered_as = curuser
-                    sub.save()
+                    subject = self.get_subject()
+                    subject.registered_as = current_user
+                    subject.save()
 
-        if curstate == S_HUMAN:
+        if current_state == S_HUMAN:
             # run anything in my queue
             for (action, params) in self.queued_actions:
                 self.process_from_queue(action, params)
@@ -158,35 +158,37 @@ class RequestExperimentManager:
         return response
 
     def get_subject(self):
+        # TODO: what if session[SPLANGO_STATE] throws KeyError?
         assert(self.request.session[SPLANGO_STATE] == S_HUMAN,
                ("Hey, you can't call get_subject until you know the subject "
                 "is a human!"))
 
-        sub = self.request.session.get(SPLANGO_SUBJECT)
+        subject = self.request.session.get(SPLANGO_SUBJECT)
+        if not subject:  # TODO: shouldn't this be ``if subject is None``?
+            subject = Subject()
+            self.request.session[SPLANGO_SUBJECT] = subject
+            subject.save()
+            logger.info("created subject: %s" % str(subject))
 
-        if not sub:
-            sub = self.request.session[SPLANGO_SUBJECT] = Subject()
-            sub.save()
-            logger.info("created subject: %s" % str(sub))
-
-        return sub
+        return subject
 
     def declare_and_enroll(self, exp_name, variants):
-        e = Experiment.declare(exp_name, variants)
+        exp = Experiment.declare(exp_name, variants)
 
+        # TODO: what if session[SPLANGO_STATE] throws KeyError?
         if self.request.session[SPLANGO_STATE] != S_HUMAN:
             logger.info("choosing new random variant for non-human")
-            v = e.get_random_variant()
-            self.enqueue("enroll", {"exp_name": e.name, "variant": v})
+            variant = exp.get_random_variant()
+            self.enqueue("enroll", {"exp_name": exp.name, "variant": variant})
 
         else:
-            sub = self.get_subject()
-            sv = e.get_variant_for(sub)
-            v = sv.variant
+            subject = self.get_subject()
+            subject_variant = exp.get_variant_for(subject)
+            variant = subject_variant.variant
             logger.info("got variant %s for subject %s" %
-                        (str(v), str(sub)))
+                        (str(variant), str(subject)))
 
-        return v
+        return variant
 
     def log_goal(self, goal_name, extra=None):
         request_info = GoalRecord.extract_request_info(self.request)

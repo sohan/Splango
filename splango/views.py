@@ -16,10 +16,10 @@ def confirm_human(request):
 @staff_member_required
 def experiments_overview(request):
     exps = Experiment.objects.all()
-    repts = ExperimentReport.objects.all()
+    reports = ExperimentReport.objects.all()
     repts_by_id = dict()
 
-    for r in repts:
+    for r in reports:
         repts_by_id.setdefault(r.experiment_id, []).append(r)
 
     for exp in exps:
@@ -31,30 +31,30 @@ def experiments_overview(request):
 
 
 @staff_member_required
-def experiment_detail(request, expname):
-    exp = get_object_or_404(Experiment, name=expname)
-    repts = ExperimentReport.objects.filter(experiment=exp)
+def experiment_detail(request, exp_name):
+    exp = get_object_or_404(Experiment, name=exp_name)
+    reports = ExperimentReport.objects.filter(experiment=exp)
 
     return render_to_response("splango/experiment_detail.html",
-                              {"title": exp.name, "exp": exp, "repts": repts},
+                              {"title": exp.name, "exp": exp, "repts": reports},
                               RequestContext(request))
 
 
 @staff_member_required
-def experiment_report(request, expname, report_id):
-    rept = get_object_or_404(ExperimentReport, id=report_id,
-                             experiment__name=expname)
-    report_rows = rept.generate()
+def experiment_report(request, exp_name, report_id):
+    report = get_object_or_404(ExperimentReport, id=report_id,
+                               experiment__name=exp_name)
+    report_rows = report.generate()
 
-    dictionary = {"title": rept.title, "exp": rept.experiment, "rept": rept,
-                  "report_rows": report_rows, }
+    dictionary = {"title": report.title, "exp": report.experiment,
+                  "rept": report, "report_rows": report_rows, }
     return render_to_response("splango/experiment_report.html", dictionary,
                               RequestContext(request))
 
 
 @staff_member_required
-def experiment_log(request, expname, variant, goal):
-    exp = get_object_or_404(Experiment, name=expname)
+def experiment_log(request, exp_name, variant, goal):
+    exp = get_object_or_404(Experiment, name=exp_name)
     goal = get_object_or_404(Goal, name=goal)
 
     enrollments = (
@@ -64,14 +64,14 @@ def experiment_log(request, expname, variant, goal):
     )
     # 1000 limit is just there to keep this page sane
 
-    goalrecords = (
+    goal_records = (
         GoalRecord.objects
         .filter(goal=goal, subject__in=[e.subject for e in enrollments])
         .select_related("goal", "subject")
     )
 
     title = "Experiment Log: variant %s, goal %s" % (variant, goal)
-    activities = list(enrollments) + list(goalrecords)
+    activities = list(enrollments) + list(goal_records)
     activities.sort(key=lambda x: x.created)
 
     dictionary = {"exp": exp, "activities": activities, "title": title}

@@ -1,21 +1,21 @@
 from django.conf.urls import *
 
+from splango import views
+
 
 urlpatterns = patterns(
-    'splango.views',
-
-    url(r'^confirm_human/$', 'confirm_human', name="splango_confirm_human"),
+    url(r'^confirm_human/$', views.confirm_human, name="splango_confirm_human"),
 
     url(r'^admin/$',
-        'experiments_overview',
+        views.experiments_overview,
         name="splango_admin"),
     url(r'^admin/exp/(?P<exp_name>[^/]+)/$',
-        'experiment_detail',
+        views.experiment_detail,
         name="splango_experiment_detail"),
     url(r'^admin/exp/(?P<exp_name>[^/]+)/(?P<report_id>\d+)/$',
-        'experiment_report',
+        views.experiment_report,
         name="splango_experiment_report"),
     url(r'^admin/exp/(?P<exp_name>[^/]+)/(?P<variant>[^/]+)/(?P<goal>[^/]+)/$',
-        'experiment_log',
+        views.experiment_log,
         name="splango_experiment_log"),
 )

@@ -3,7 +3,7 @@
 
 {% block title %}Splango: Experiment {{title}}{% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url splango-admin %}">Splango</a>
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url splango_admin %}">Splango</a>
 
 {% if title %} &rsaquo; {{ title }}{% endif %}
 </div>{% endblock %}
@@ -14,7 +14,7 @@
 {% if reports %}
 <ul>
   {% for report in reports %}
-  <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=report.id %}">{{report.title}}</a></li>
+  <li><a href="{% url splango_experiment_report exp_name=exp.name report_id=report.id %}">{{report.title}}</a></li>
   {% endfor %}
 </ul>
 {% else %}

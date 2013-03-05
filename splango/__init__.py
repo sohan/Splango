@@ -77,7 +77,7 @@ class RequestExperimentManager:
                        'fixed.\\n\\nDetails:\\n"+e.toString()); }')
 
         try:
-            url = reverse("splango-confirm-human")
+            url = reverse("splango_confirm_human")
         except NoReverseMatch:
             url = "/splango/confirm_human/"
 

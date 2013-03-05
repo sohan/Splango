@@ -9,25 +9,25 @@ from .models import Enrollment, Experiment, ExperimentReport, Goal, GoalRecord
 
 @never_cache
 def confirm_human(request):
-    request.experiments.confirm_human()
+    request.experiments_manager.confirm_human()
     return HttpResponse(status=204)
 
 
 @staff_member_required
 def experiments_overview(request):
-    exps = Experiment.objects.all()
+    experiments = Experiment.objects.all()
     reports = ExperimentReport.objects.all()
-    repts_by_id = dict()
+    reports_by_id = dict()
 
     for r in reports:
-        repts_by_id.setdefault(r.experiment_id, []).append(r)
+        reports_by_id.setdefault(r.experiment_id, []).append(r)
+    for e in experiments:
+        e.reports = reports_by_id.get(e.name, [])
 
-    for exp in exps:
-        exp.reports = repts_by_id.get(exp.name, [])
-
-    return render_to_response("splango/experiments_overview.html",
-                              {"title": "Experiments", "exps": exps},
-                              RequestContext(request))
+    return render_to_response(
+        "splango/experiments_overview.html",
+        {"title": "Experiments", "experiments": experiments},
+        RequestContext(request))
 
 
 @staff_member_required
@@ -35,9 +35,10 @@ def experiment_detail(request, exp_name):
     exp = get_object_or_404(Experiment, name=exp_name)
     reports = ExperimentReport.objects.filter(experiment=exp)
 
-    return render_to_response("splango/experiment_detail.html",
-                              {"title": exp.name, "exp": exp, "repts": reports},
-                              RequestContext(request))
+    return render_to_response(
+        "splango/experiment_detail.html",
+        {"title": exp.name, "exp": exp, "reports": reports},
+        RequestContext(request))
 
 
 @staff_member_required
@@ -47,7 +48,7 @@ def experiment_report(request, exp_name, report_id):
     report_rows = report.generate()
 
     dictionary = {"title": report.title, "exp": report.experiment,
-                  "rept": report, "report_rows": report_rows, }
+                  "report": report, "report_rows": report_rows, }
     return render_to_response("splango/experiment_report.html", dictionary,
                               RequestContext(request))
 

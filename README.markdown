@@ -10,21 +10,21 @@ admin UI for viewing simple funnel reports on the results.
     {% load splangotags %}
 
     {# first declare the experiment and its variants #}
-    {% experiment "signuptext" variants "control,free,trial" %}
+    {% experiment "signup_text" variants "control,free,trial" %}
 
     Welcome to my site! Please
     <a href="/signup">
 
     {# change what is rendered based on which experimental variant you're in #}
-    {% hyp "signuptext" "control" %}
+    {% hyp "signup_text" "control" %}
        sign up
     {% endhyp %}
 
-    {% hyp "signuptext" "free" %}
+    {% hyp "signup_text" "free" %}
        sign up for free
     {% endhyp %}
 
-    {% hyp "signuptext" "trial" %}
+    {% hyp "signup_text" "trial" %}
        sign up for a trial
     {% endhyp %}
     </a>
@@ -33,25 +33,25 @@ admin UI for viewing simple funnel reports on the results.
 ## Python View Example
 
     def mypage(request):
-        exp = request.experiments
+        exp_manager = request.experiments_manager
 
-        expvariant = exp.declare_and_enroll("call_to_action", ["a","b"])
+        exp_variant = exp_manager.declare_and_enroll("call_to_action", ["a","b"])
 
-        if expvariant == "a":
+        if exp_variant == "a":
             call_to_action_label = "try it"
-        elif expvariant == "b":
+        elif exp_variant == "b":
             call_to_action_label = "this might not suck"
 
         if request.method == "POST":
             form = PleaseDoThisForm(request.POST)
 
             if form.is_valid():
-                exp.log_goal("pleasedoform.completed")
+                exp_manager.log_goal("pleasedoform.completed")
                 return HttpResponseRedirect(...)
 
         else:
             form = PleaseDoThisForm()
-            exp.log_goal("pleasedoform.seen")
+            exp_manager.log_goal("pleasedoform.seen")
 
         return render_to_response("mytemplate.html", { 
            "call_to_action_label": call_to_action_label },

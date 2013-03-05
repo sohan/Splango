@@ -13,14 +13,14 @@
 
 {% block content %}
 <h2>Active Experiments</h2>
-{% if exps %}
+{% if experiments %}
 <ul>
-  {% for exp in exps %}
+  {% for exp in experiments %}
   <li><a href="{% url splango-experiment-detail exp_name=exp.name %}">{{exp}}</a>
     {% if exp.reports %}
     <ul>
-      {% for rept in exp.reports %}
-      <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=rept.id %}">{{rept.title}}</a></li>
+      {% for report in exp.reports %}
+      <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=report.id %}">{{report.title}}</a></li>
       {% endfor %}
     </ul>
     {% endif %}

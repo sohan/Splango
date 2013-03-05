@@ -11,10 +11,10 @@
 
 {% block content %}
 <h2>Reports</h2>
-{% if repts %}
+{% if reports %}
 <ul>
-  {% for rept in repts %}
-  <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=rept.id %}">{{rept.title}}</a></li>
+  {% for report in reports %}
+  <li><a href="{% url splango-experiment-report exp_name=exp.name report_id=report.id %}">{{report.title}}</a></li>
   {% endfor %}
 </ul>
 {% else %}

@@ -20,15 +20,16 @@ class ExperimentNode(template.Node):
                 "settings.TEMPLATE_CONTEXT_PROCESSORS.")
 
         request = context["request"]
-        exp = request.experiments
+        exp_manager = request.experiments_manager
 
-        if not exp:
+        if not exp_manager:
             raise template.TemplateSyntaxError(
                 "Use of splangotags requires the splango middleware. Please "
                 "add splango.middleware.ExperimentsMiddleware to your "
                 "settings.MIDDLEWARE_CLASSES.")
 
-        exp_variant = exp.declare_and_enroll(self.exp_name, self.variants)
+        exp_variant = exp_manager.declare_and_enroll(self.exp_name,
+                                                     self.variants)
         context[CTX_PREFIX + self.exp_name] = exp_variant
 
         return ""  # "exp: %s - you are %s" % (self.exp_name, exp_variant)

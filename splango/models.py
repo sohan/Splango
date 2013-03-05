@@ -71,11 +71,11 @@ class GoalRecord(models.Model):
     subject = models.ForeignKey(Subject)
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
-    req_HTTP_REFERER = models.CharField(max_length=255, null=True, blank=True)
-    req_REMOTE_ADDR = models.IPAddressField(null=True, blank=True)
-    req_path = models.CharField(max_length=255, null=True, blank=True)
+    req_HTTP_REFERER = models.CharField(max_length=255, blank=True)
+    req_REMOTE_ADDR = models.IPAddressField(blank=True)
+    req_path = models.CharField(max_length=255, blank=True)
 
-    extra = models.CharField(max_length=255, null=True, blank=True)
+    extra = models.CharField(max_length=255, blank=True)
 
     class Meta:
         unique_together = (('subject', 'goal'),)

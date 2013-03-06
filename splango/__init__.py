@@ -94,6 +94,8 @@ class RequestExperimentManager:
             self.process_from_queue(action, params)
 
     def finish(self, response):
+        """Decide what to do if subject is human or not."""
+
         current_state = self.request.session.get(SPLANGO_STATE, S_UNKNOWN)
 
         #logger.info("finished... state=%s" % current_state)

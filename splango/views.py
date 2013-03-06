@@ -45,13 +45,12 @@ def experiment_detail(request, exp_name):
 
 
 @staff_member_required
-def experiment_report(request, exp_name, report_id):
+def experiment_report(request, report_id):
     """Shows the experiment report."""
     # Is really necessary ``exp_name`` as a param? An ExperimentReport already
     # has an experiment as a field.
 
-    report = get_object_or_404(ExperimentReport, id=report_id,
-                               experiment__name=exp_name)
+    report = get_object_or_404(ExperimentReport, id=report_id)
     report_rows = report.generate()
 
     dictionary = {"title": report.title, "exp": report.experiment,

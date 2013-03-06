@@ -12,7 +12,7 @@ urlpatterns = patterns(
     url(r'^admin/exp/(?P<exp_name>[^/]+)/$',
         views.experiment_detail,
         name="splango_experiment_detail"),
-    url(r'^admin/exp/(?P<exp_name>[^/]+)/(?P<report_id>\d+)/$',
+    url(r'^admin/exp/report/(?P<report_id>\d+)/$',
         views.experiment_report,
         name="splango_experiment_report"),
     url(r'^admin/exp/(?P<exp_name>[^/]+)/(?P<variant>[^/]+)/(?P<goal>[^/]+)/$',

@@ -14,7 +14,7 @@
 {% if reports %}
 <ul>
   {% for report in reports %}
-  <li><a href="{% url splango_experiment_report exp_name=exp.name report_id=report.id %}">{{report.title}}</a></li>
+  <li><a href="{% url splango_experiment_report report_id=report.id %}">{{report.title}}</a></li>
   {% endfor %}
 </ul>
 {% else %}

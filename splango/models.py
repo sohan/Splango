@@ -69,7 +69,7 @@ class Subject(models.Model):
 
 class GoalRecord(models.Model):
 
-    """Relates the goal reached by the subject."""
+    """Associate the goal reached by a subject with that subject."""
 
     goal = models.ForeignKey(Goal)
     subject = models.ForeignKey(Subject)
@@ -197,6 +197,17 @@ class ExperimentReport(models.Model):
         return [x.strip() for x in self.funnel.split("\n") if x]
 
     def generate(self):
+        """Generate the report for experiment.
+
+        Generate the report of a experiment goals and variants.
+
+        Associate each variant with a goal, and associate the variant
+        count too.
+
+        :returns: A dict with goals, variants and variants counts associated
+        to each goal
+
+        """
         result = []
         exp = self.experiment
         variants = self.experiment.get_variants()

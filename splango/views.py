@@ -16,7 +16,7 @@ def confirm_human(request):
 
 @staff_member_required
 def experiments_overview(request):
-    """Shows experiments list."""
+    """Show experiments list."""
     experiments = Experiment.objects.all()
     reports = ExperimentReport.objects.all()
     reports_by_id = dict()
@@ -34,7 +34,7 @@ def experiments_overview(request):
 
 @staff_member_required
 def experiment_detail(request, exp_name):
-    """Shows the experiment and its reports."""
+    """Show the experiment and its reports."""
     exp = get_object_or_404(Experiment, name=exp_name)
     reports = ExperimentReport.objects.filter(experiment=exp)
 
@@ -46,7 +46,7 @@ def experiment_detail(request, exp_name):
 
 @staff_member_required
 def experiment_report(request, report_id):
-    """Shows the experiment report."""
+    """Show the experiment report."""
     # Is really necessary ``exp_name`` as a param? An ExperimentReport already
     # has an experiment as a field.
 
@@ -61,14 +61,14 @@ def experiment_report(request, report_id):
 
 @staff_member_required
 def experiment_log(request, exp_name, variant, goal):
-    """This is what shows an enrollment, that dentifies which variant a
-    subject is assigned to in a given experiment.
+    """Show an enrollment, that dentifies which variant a subject is assigned
+    to in a given experiment.
 
     In the response, it returns the experiment itself; the activities, that
     shows what goals reached by the subject, with the given variant, and the
     title, that shows the activity in string format.
 
-    :return: The experiment log response
+    :returns: The experiment log response
     """
     exp = get_object_or_404(Experiment, name=exp_name)
     goal = get_object_or_404(Goal, name=goal)

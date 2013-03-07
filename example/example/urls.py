@@ -10,6 +10,7 @@ urlpatterns = patterns(
     # url(r'^$', 'example.views.home', name='home'),
     # url(r'^example/', include('example.foo.urls')),
 
+    url(r'^example/', include('myapp.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'splango/', include('splango.urls')),
 )

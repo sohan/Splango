@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (Subject, Goal, GoalRecord, Enrollment, Experiment,
-                     ExperimentReport)
+                     ExperimentReport, Variant)
 
 
 admin.site.register(Subject)
@@ -30,3 +30,8 @@ admin.site.register(Experiment, ExperimentAdmin)
 class ExperimentReportAdmin(admin.ModelAdmin):
     list_display = ("title", "experiment")
 admin.site.register(ExperimentReport, ExperimentReportAdmin)
+
+
+class VariantAdmin(admin.ModelAdmin):
+    list_display = ("name", "experiment", "weight")
+admin.site.register(Variant, VariantAdmin)

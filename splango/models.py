@@ -156,14 +156,9 @@ class Experiment(models.Model):
         return random.choice(self.get_variants())
 
     def variants_commasep(self):
-        variants = []
-
-        if self.get_variants():
-            for variant in self.get_variants():
-                variants.append(variant.name)
-            return ",".join(variants)
-        else:
-            return ""
+        variants = self.get_variants()
+        variants_names = [v.name for v in variants]
+        return ','.join(variants_names)
 
     def get_variant_for(self, subject):
         enrollment, created = Enrollment.objects.get_or_create(
@@ -180,9 +175,15 @@ class Experiment(models.Model):
         return enrollment
 
     @classmethod
-    def declare(cls, name, variants):
-        obj, created = cls.objects.get_or_create(
-            name=name, defaults={"variants": variants, })
+    def declare(cls, name, variants_names):
+        """create or update an experiment and its variants (variant names
+        given).
+
+        """
+        obj, created = cls.objects.get_or_create(name=name)
+
+        for v in variants_names:
+            Variant.objects.create(name=v, experiment=obj)
         return obj
 
 
@@ -261,8 +262,8 @@ class ExperimentReport(models.Model):
                     vcount = 0
                     pct = 0
 
-                pct_cumulative = pct * \
-                    result[previ]["variant_counts"][vi]["pct_cumulative"]
+                pct_cumulative = \
+                    pct * result[previ]["variant_counts"][vi]["pct_cumulative"]
 
                 variant_counts.append(dict(
                     val=vcount,
@@ -282,7 +283,7 @@ class Variant(models.Model):
     """An Experiment Variant, with optional weight"""
 
     experiment = models.ForeignKey('splango.Experiment',
-                                       related_name="variants")
+                                   related_name="variants")
 
     name = models.CharField(max_length=100, blank=True)
     weight = models.IntegerField(null=True, blank=True,

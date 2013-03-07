@@ -183,7 +183,7 @@ class Experiment(models.Model):
         obj, created = cls.objects.get_or_create(name=name)
 
         for v in variants_names:
-            Variant.objects.create(name=v, experiment=obj)
+            Variant.objects.get_or_create(name=v, experiment=obj)
         return obj
 
 

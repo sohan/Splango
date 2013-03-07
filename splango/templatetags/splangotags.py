@@ -57,7 +57,7 @@ class HypNode(template.Node):
                 "and supply variant names using an experiment tag before "
                 "using hyp tags.")
 
-        if self.exp_variant == context[ctx_var]:
+        if self.exp_variant == context[ctx_var].name:
             return self.node_list.render(context)
         else:
             return ""

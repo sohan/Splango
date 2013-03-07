@@ -124,7 +124,7 @@ class Enrollment(models.Model):
     subject = models.ForeignKey('splango.Subject', editable=False)
     experiment = models.ForeignKey('splango.Experiment', editable=False)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
-    variant = models.CharField(max_length=_NAME_LENGTH)
+    variant = models.ForeignKey('splango.Variant')
 
     class Meta:
         unique_together = (('subject', 'experiment'),)
@@ -139,7 +139,6 @@ class Experiment(models.Model):
     """A named experiment."""
 
     name = models.CharField(max_length=_NAME_LENGTH, primary_key=True)
-    variants = models.TextField()  # one per line... lame and simple
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     subjects = models.ManyToManyField(Subject, through=Enrollment)
@@ -147,17 +146,24 @@ class Experiment(models.Model):
     def __unicode__(self):
         return self.name
 
-    def set_variants(self, variant_list):
-        self.variants = "\n".join(variant_list)
+    # def set_variants(self, variant_list):
+    #     self.variants = "\n".join(variant_list)
 
     def get_variants(self):
-        return [x for x in self.variants.split("\n") if x]
+        return self.variants.all()
 
     def get_random_variant(self):
         return random.choice(self.get_variants())
 
     def variants_commasep(self):
-        return ",".join(self.get_variants())
+        variants = []
+
+        if self.get_variants():
+            for variant in self.get_variants():
+                variants.append(variant.name)
+            return ",".join(variants)
+        else:
+            return ""
 
     def get_variant_for(self, subject):
         enrollment, created = Enrollment.objects.get_or_create(
@@ -176,7 +182,7 @@ class Experiment(models.Model):
     @classmethod
     def declare(cls, name, variants):
         obj, created = cls.objects.get_or_create(
-            name=name, defaults={"variants": "\n".join(variants), })
+            name=name, defaults={"variants": variants, })
         return obj
 
 
@@ -269,3 +275,19 @@ class ExperimentReport(models.Model):
             result.append({"goal": goal, "variant_counts": variant_counts})
 
         return result
+
+
+class Variant(models.Model):
+
+    """An Experiment Variant, with optional weight"""
+
+    experiment = models.ForeignKey('splango.Experiment',
+                                       related_name="variants")
+
+    name = models.CharField(max_length=100, blank=True)
+    weight = models.IntegerField(null=True, blank=True,
+                                 help_text="The priority of the variant")
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.name, self.experiment)
+

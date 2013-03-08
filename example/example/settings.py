@@ -6,6 +6,8 @@ Based in :mod:`example.settings` of project "django-social-auth"
 """
 from os.path import abspath, dirname, basename, join
 
+import django.conf.global_settings as DEFAULT_SETTINGS
+
 
 ROOT_PATH = abspath(dirname(__file__))
 PROJECT_NAME = basename(ROOT_PATH)
@@ -51,6 +53,10 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     #'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
 )
 
 MIDDLEWARE_CLASSES = (

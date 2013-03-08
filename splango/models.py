@@ -159,18 +159,29 @@ class Experiment(models.Model):
     def variants_commasep(self):
         return ",".join(self.get_variants())
 
-    def get_variant_for(self, subject):
-        enrollment, created = Enrollment.objects.get_or_create(
-            subject=subject,
-            experiment=self,
-            defaults={"variant": self.get_random_variant(), })
-        return enrollment
+    def get_or_create_enrollment(self, subject, variant=None):
+        """Get or create an :class:`Enrollment` object for ``subject``.
 
-    def enroll_subject_as_variant(self, subject, variant):
+        Only if the object is to be created will ``variant`` be used.
+        If ``variant`` is None, a random variant will be assigned.
+
+        :param subject: the subject of the enrollment
+        :type subject: :class:`Subject`
+        :param variant: when creating the object, it is the variant to use;
+            if None, a random variant will be used
+            created, this will be the value for :attr:`Enrollment.variant`
+        :type variant: str or None
+        :return: the enrollment for ``subject``
+        :rtype: :class:`Enrollment`
+
+        """
+        if variant is None:
+            self.get_random_variant()
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,
-            defaults={"variant": variant, })
+            defaults={"variant": variant}
+        )
         return enrollment
 
     @classmethod

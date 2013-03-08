@@ -1,0 +1,16 @@
+{% block content %}
+	{% load splangotags %}
+
+
+	{% experiment "sample_experiment" variants "red,blue" %}
+
+    <p>
+        {% hyp "sample_experiment" "blue" %}
+            Blue!
+        {% endhyp %}
+        {% hyp "sample_experiment" "red" %}
+            Red
+        {% endhyp %}
+	</p>
+
+{% endblock %}

@@ -164,7 +164,8 @@ class Experiment(models.Model):
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,
-            defaults={"variant": self.get_random_variant(), })
+            defaults={"variant": self.get_random_variant(), }
+        )
         return enrollment
 
     def enroll_subject_as_variant(self, subject, variant):
@@ -285,7 +286,7 @@ class Variant(models.Model):
     experiment = models.ForeignKey('splango.Experiment',
                                    related_name="variants")
 
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=_NAME_LENGTH, blank=True)
     weight = models.IntegerField(null=True, blank=True,
                                  help_text="The priority of the variant")
 

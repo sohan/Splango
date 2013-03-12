@@ -151,10 +151,34 @@ class Experiment(models.Model):
         self.variants = "\n".join(variant_list)
 
     def get_variants(self):
+        """Return a list of all variants.
+
+        :return: variants
+        :rtype: list of basestring
+
+        """
         return [x for x in self.variants.split("\n") if x]
 
     def get_random_variant(self):
-        return random.choice(self.get_variants())
+        """Return one of the object's variants chosen in a random way.
+
+        .. warning::
+            There is a reason why a :class:`random.Random` generator is created
+            in every call: using :func:`random.choice` used use the same
+            generator every time because of it is not really a function but
+            a method of a hidden instance of :class:`random.Random`, defined in
+            :mod:`random`. Debugging we could see that the instance's internal
+            state was always the same, thus the output will not be random!
+
+            Also, :method:`random.Random.jumpahead` seemed to be the solution
+            but it is not recommended and was removed in Python 3.
+
+        :return: variant
+        :rtype: basestring
+
+        """
+        generator = random.Random()
+        return generator.choice(self.get_variants())
 
     def variants_commasep(self):
         return ",".join(self.get_variants())

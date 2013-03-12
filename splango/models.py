@@ -153,26 +153,54 @@ class Experiment(models.Model):
         return self.variants.all()
 
     def get_random_variant(self):
-        return random.choice(self.get_variants())
+        """Return one of the object's variants chosen in a random way.
+
+        .. warning::
+            There is a reason why a :class:`random.Random` generator is created
+            in every call: using :func:`random.choice` used use the same
+            generator every time because of it is not really a function but
+            a method of a hidden instance of :class:`random.Random`, defined in
+            :mod:`random`. Debugging we could see that the instance's internal
+            state was always the same, thus the output will not be random!
+
+            Also, :method:`random.Random.jumpahead` seemed to be the solution
+            but it is not recommended and was removed in Python 3.
+
+        :return: variant
+        :rtype: basestring
+
+        """
+        generator = random.Random()
+        return generator.choice(self.get_variants())
 
     def variants_commasep(self):
         variants = self.get_variants()
         variants_names = [v.name for v in variants]
         return ','.join(variants_names)
 
-    def get_variant_for(self, subject):
-        enrollment, created = Enrollment.objects.get_or_create(
-            subject=subject,
-            experiment=self,
-            defaults={"variant": self.get_random_variant(), }
-        )
-        return enrollment
+    def get_or_create_enrollment(self, subject, variant=None):
+        """Get or create an :class:`Enrollment` object for ``subject``.
 
-    def enroll_subject_as_variant(self, subject, variant):
+        Only if the object is to be created will ``variant`` be used.
+        If ``variant`` is None, a random variant will be assigned.
+
+        :param subject: the subject of the enrollment
+        :type subject: :class:`Subject`
+        :param variant: when creating the object, it is the variant to use;
+            if None, a random variant will be used
+            created, this will be the value for :attr:`Enrollment.variant`
+        :type variant: str or None
+        :return: the enrollment for ``subject``
+        :rtype: :class:`Enrollment`
+
+        """
+        if variant is None:
+            variant = self.get_random_variant()
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,
-            defaults={"variant": variant, })
+            defaults={"variant": variant}
+        )
         return enrollment
 
     @classmethod

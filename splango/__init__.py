@@ -49,8 +49,8 @@ class RequestExperimentManager:
 
         if action == "enroll":
             exp = Experiment.objects.get(name=params["exp_name"])
-            exp.enroll_subject_as_variant(self.get_subject(),
-                                          params["variant"])
+            variant = params["variant"]
+            exp.get_or_create_enrollment(self.get_subject(), variant)
 
         elif action == "log_goal":
             goal_record = GoalRecord.record(self.get_subject(),
@@ -185,7 +185,7 @@ class RequestExperimentManager:
 
         else:
             subject = self.get_subject()
-            subject_variant = exp.get_variant_for(subject)
+            subject_variant = exp.get_or_create_enrollment(subject)
             variant = subject_variant.variant
             logger.info("got variant %s for subject %s" %
                         (str(variant), str(subject)))

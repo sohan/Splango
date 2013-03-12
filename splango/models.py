@@ -176,7 +176,7 @@ class Experiment(models.Model):
 
         """
         if variant is None:
-            self.get_random_variant()
+            variant = self.get_random_variant()
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
             experiment=self,

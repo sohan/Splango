@@ -309,14 +309,18 @@ class ExperimentReport(models.Model):
 
 class Variant(models.Model):
 
-    """An Experiment Variant, with optional weight"""
+    """An Experiment Variant, with optional weight
+
+    (The weight is not considered at the moment)
+
+    """
 
     experiment = models.ForeignKey('splango.Experiment',
                                    related_name="variants")
 
     name = models.CharField(max_length=_NAME_LENGTH, blank=True)
-    weight = models.IntegerField(null=True, blank=True,
-                                 help_text="The priority of the variant")
+    # weight = models.IntegerField(null=True, blank=True,
+    #                              help_text="The priority of the variant")
 
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.experiment)

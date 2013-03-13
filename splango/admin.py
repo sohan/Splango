@@ -33,5 +33,7 @@ admin.site.register(ExperimentReport, ExperimentReportAdmin)
 
 
 class VariantAdmin(admin.ModelAdmin):
-    list_display = ("name", "experiment", "weight")
+    list_display = ("name", "experiment",
+                    # "weight"
+    )
 admin.site.register(Variant, VariantAdmin)

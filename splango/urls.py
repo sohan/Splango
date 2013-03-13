@@ -4,7 +4,6 @@ from splango import views
 
 
 urlpatterns = patterns(
-    url(r'^confirm_human/$', views.confirm_human, name="splango_confirm_human"),
 
     url(r'^admin/$',
         views.experiments_overview,

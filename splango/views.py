@@ -1,17 +1,8 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.views.decorators.cache import never_cache
 
 from .models import Enrollment, Experiment, ExperimentReport, Goal, GoalRecord
-
-
-@never_cache
-def confirm_human(request):
-    """Confirms that is a human who is running the experiment, not a bot."""
-    request.experiments_manager.confirm_human()
-    return HttpResponse(status=204)
 
 
 @staff_member_required

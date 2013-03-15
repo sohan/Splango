@@ -58,28 +58,30 @@ class InitTest(TestCase):
         self.variant_names.append(self.variant2.name)
 
     def test_declare_and_enroll(self):
-        """Test splango.RequestExperimentManager.declare_and_enroll()."""
+        """Test splango.RequestExperimentManager.declare_and_enroll."""
 
         # RequestExperimentManager needs a request as a param.
         # Lets do a mock for the request.
         request = MagicMock()
 
-        # Lets instanciate RequestExperimentManager now.
+        # Lets instanciate :class:``splango.RequestExperimentManager`` now.
         exp_man = RequestExperimentManager(request)
 
         # It is needed a subject, because ``exp_man`` will call
-        # ``get_subject()`` method. So we mock that method in order to have
-        # the right returned value.
+        # :func:``splango.RequestExperimentManager.get_subject`` method. So,
+        # we mock that method in order to have the right returned value.
         subject_ = create_subject()
         exp_man.get_subject = MagicMock(name="Subject")
         exp_man.get_subject.return_value = subject_
 
-        # Verify that ``get_subject()`` actually gets a `Subject` instance.
+        # Verify that :func:``splango.RequestExperimentManager.get_subject``
+        # actually gets a :class:`Subject` instance.
         mocked_subject = exp_man.get_subject()
         self.assertIsInstance(mocked_subject, Subject)
 
-        # Now, call ``declare_and_enroll()`` and assert if the returned value
-        # is a `Variant` instance.
+        # Now, call
+        # :func:``splango.RequestExperimentManager.declare_and_enroll`` and
+        # assert if the returned value is a :class:`Variant` instance.
         variant = exp_man.declare_and_enroll(self.experiment.name,
                                              self.variant_names, )
         self.assertIsInstance(variant, Variant)

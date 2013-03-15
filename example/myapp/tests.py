@@ -216,3 +216,37 @@ class BehaviourTest(LiveServerTestCase):
         self.assertIn("anonymous subject",
                       anonymous_enrollment.subject.__unicode__())
 
+    def test_as_anonymous_user_and_then_as_registered_user(self):
+        """Test that an anonymous user is merged into the registered one,
+        if he keeps the same session.
+
+        """
+        self._goto('/example/sample/')
+
+        # Just one enrollment created
+        self.assertEquals(Enrollment.objects.count(), 1)
+
+        # this is an anonymous enrollment
+        anonymous_enrollment = Enrollment.objects.all()[0]
+
+        # assert the subject is actually anonymous
+        self.assertIn("anonymous subject",
+                      anonymous_enrollment.subject.__unicode__())
+
+        # Now login
+        self._login()
+
+        # Go to the experiment again
+        self._goto('/example/sample/')
+
+        # There is only one enrollment
+        self.assertEquals(Enrollment.objects.count(), 1)
+
+        # That enrollment is the same that the previous anonymous enrollment
+        # i.e., the anonymous enrollment now is a registered user one.
+        not_anon_enrollment = Enrollment.objects.all()[0]
+        self.assertEquals(not_anon_enrollment.variant,
+                          anonymous_enrollment.variant)
+
+        self.assertEquals(not_anon_enrollment.subject,
+                          anonymous_enrollment.subject)

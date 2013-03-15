@@ -1,9 +1,5 @@
 import logging
 
-from django.utils.encoding import smart_unicode
-from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
-
 from .models import Subject, Experiment, Enrollment, GoalRecord, Variant
 from .utils import is_first_visit, replace_insensitive
 

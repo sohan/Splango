@@ -10,6 +10,20 @@ register = django.template.Library()
 CTX_PREFIX = "__splango__experiment__"
 
 
+UNDECLARED_EXPERIMENT_WARNING = (
+    "Experiment has not yet been declared. Please declare it "
+    "and supply variant names using an experiment tag before "
+    "using hyp tags.")
+REQUEST_CONTEXT_PROCESSOR_WARNING = (
+    "Use of splangotags requires the request context processor. "
+    "Please add django.core.context_processors.request to your "
+    "settings.TEMPLATE_CONTEXT_PROCESSORS.")
+SPLANGO_MIDDLEWARE_WARNING = (
+    "Use of splangotags requires the splango middleware. Please "
+    "add splango.middleware.ExperimentsMiddleware to your "
+    "settings.MIDDLEWARE_CLASSES.")
+
+
 class ExperimentNode(django.template.Node):
 
     """Template node for the {% experiment ... %} template tag.
@@ -37,21 +51,14 @@ class ExperimentNode(django.template.Node):
 
         """
         if "request" not in context:
-            msg = ("Use of splangotags requires the request context processor. "
-                   "Please add django.core.context_processors.request to your "
-                   "settings.TEMPLATE_CONTEXT_PROCESSORS.")
-            logger.error(msg)
-            raise TemplateSyntaxError(msg)
+            logger.error(REQUEST_CONTEXT_PROCESSOR_WARNING)
+            raise TemplateSyntaxError(REQUEST_CONTEXT_PROCESSOR_WARNING)
 
         request = context["request"]
         exp_manager = request.experiments_manager
-
         if not exp_manager:
-            msg = ("Use of splangotags requires the splango middleware. Please "
-                   "add splango.middleware.ExperimentsMiddleware to your "
-                   "settings.MIDDLEWARE_CLASSES.")
-            logger.error(msg)
-            raise TemplateSyntaxError(msg)
+            logger.error(SPLANGO_MIDDLEWARE_WARNING)
+            raise TemplateSyntaxError(SPLANGO_MIDDLEWARE_WARNING)
 
         exp_variant = exp_manager.declare_and_enroll(self.exp_name,
                                                      self.variants)
@@ -77,11 +84,8 @@ class HypNode(django.template.Node):
         ctx_var = CTX_PREFIX + self.exp_name
 
         if ctx_var not in context:
-            msg = ("Experiment %s has not yet been declared. Please declare it "
-                   "and supply variant names using an experiment tag before "
-                   "using hyp tags.")
-            logger.error(msg)
-            raise TemplateSyntaxError(msg)
+            logger.error(UNDECLARED_EXPERIMENT_WARNING)
+            raise TemplateSyntaxError(UNDECLARED_EXPERIMENT_WARNING)
 
         if self.exp_variant == context[ctx_var].name:
             return self.node_list.render(context)

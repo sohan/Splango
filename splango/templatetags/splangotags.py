@@ -124,8 +124,9 @@ def experiment(parser, token):
         logger.error(msg)
         raise TemplateSyntaxError(msg)
 
-    return ExperimentNode(exp_name.strip("\"'"),
-                          variant_str.strip("\"'").split(","))
+    clean_exp_name = exp_name.strip("\"'")
+    clean_variant_str = variant_str.strip("\"'")
+    return ExperimentNode(clean_exp_name, clean_variant_str)
 
 
 @register.tag
@@ -163,7 +164,9 @@ def hyp(parser, token):
     parser.delete_first_token()
     #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
 
-    return HypNode(exp_name.strip("\"'"), exp_variant.strip("\"'"), node_list)
+    clean_exp_name = exp_name.strip("\"'")
+    clean_variant_name = exp_variant.strip("\"'")
+    return HypNode(clean_exp_name, clean_variant_name, node_list)
 
 
 # I couldn't make this work well. Probably needs much more thought to work like

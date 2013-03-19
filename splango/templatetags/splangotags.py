@@ -82,8 +82,8 @@ def experiment(parser, token):
         tag_name, exp_name, variants_label, variant_str = token.split_contents()
     except ValueError:
         tag_name = token.contents.split()[0]
-        msg = ('%r tag requires exactly three arguments, e.g. {% experiment '
-               '"signuptext" variants "control,free,trial" %}' % tag_name)
+        msg = ('%r tag requires exactly three arguments, e.g. {%% experiment '
+               '"signuptext" variants "control,free,trial" %%}' % tag_name)
         logger.error(msg)
         raise TemplateSyntaxError(msg)
 

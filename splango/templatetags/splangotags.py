@@ -12,11 +12,30 @@ CTX_PREFIX = "__splango__experiment__"
 
 class ExperimentNode(django.template.Node):
 
+    """Template node for the {% experiment ... %} template tag.
+
+    This
+
+    :meth:`render` returns an empty string (thus
+    ``{% experiment "..." variants "...,...,..." %}`` renders nothing) but
+    it must be called so that the experiment is recorded appropriately.
+
+    """
+
     def __init__(self, exp_name, variants):
         self.exp_name = exp_name
         self.variants = variants
 
     def render(self, context):
+        """Declare the experiment and enroll a variant. Render nothing.
+
+        :param context:
+        :return: empty string
+        :raises: :class:`django.template.TemplateSyntaxError` if ``'request'``
+          is not in ``context``, or if the former does not have an experiments
+          manager.
+
+        """
         if "request" not in context:
             msg = ("Use of splangotags requires the request context processor. "
                    "Please add django.core.context_processors.request to your "
@@ -78,6 +97,20 @@ class HypNode(django.template.Node):
 
 @register.tag
 def experiment(parser, token):
+    """Return a :class:`ExperimentNode` according to the contents of ``token``.
+
+    Example::
+        {% experiment "signup_button" variants "red,blue" %}
+
+    :param parser: template parser object, not used
+    :param token: tag contents i.e. between ``{% `` and `` %}``
+    :type token: :class:`django.template.base.Token`
+    :return: experiment node
+    :rtype: :class:`ExperimentNode`
+    :raises: :class:`django.template.TemplateSyntaxError` if tag arguments
+      in ``token`` are different than three
+
+    """
     try:
         tag_name, exp_name, variants_label, variant_str = token.split_contents()
     except ValueError:
@@ -93,6 +126,21 @@ def experiment(parser, token):
 
 @register.tag
 def hyp(parser, token):
+    """Return a :class:`HypNode` according to the contents of ``token``.
+
+    Example::
+        {% hyp "signup_button" "blue" %}
+
+    :param parser: template parser object
+    :type parser: :class:`django.template.base.Parser`
+    :param token: tag contents i.e. between ``{% `` and `` %}``
+    :type token: :class:`django.template.base.Token`
+    :return: experiment node
+    :rtype: :class:`ExperimentNode`
+    :raises: :class:`django.template.TemplateSyntaxError` if tag arguments
+      in ``token`` are different than two
+
+    """
     try:
         tag_name, exp_name, exp_variant = token.split_contents()
     except ValueError:

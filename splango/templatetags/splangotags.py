@@ -92,13 +92,10 @@ class HypNode(django.template.Node):
                (self.exp_name, self.exp_variant))
         logger.debug(msg)
 
-        ctx_var = CTX_PREFIX + self.exp_name
+        enrolled_variant_name = self._get_enrolled_variant_name(context)
+        logger.debug("enrolled variant name %s" % enrolled_variant_name)
 
-        if ctx_var not in context:
-            logger.error(UNDECLARED_EXPERIMENT_WARNING)
-            raise TemplateSyntaxError(UNDECLARED_EXPERIMENT_WARNING)
-
-        if self.exp_variant == context[ctx_var].name:
+        if self.exp_variant == enrolled_variant_name:
             # render the contents within {% hyp %} and {% endhyp %}
             return self.node_list.render(context)
         else:
@@ -106,6 +103,13 @@ class HypNode(django.template.Node):
             logger.debug("HypNode(%s, %s) not rendered" %
                          (self.exp_name, self.exp_variant))
             return ""
+
+    def _get_enrolled_variant_name(self, context):
+        ctx_var = CTX_PREFIX + self.exp_name
+        if ctx_var not in context:
+            logger.error(UNDECLARED_EXPERIMENT_WARNING)
+            raise TemplateSyntaxError(UNDECLARED_EXPERIMENT_WARNING)
+        return context[ctx_var].name
 
 
 @register.tag

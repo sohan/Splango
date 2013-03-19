@@ -1,7 +1,10 @@
+import logging
+
 import django.template
 from django.template import TemplateSyntaxError
 
 
+logger = logging.getLogger(__name__)
 register = django.template.Library()
 
 CTX_PREFIX = "__splango__experiment__"
@@ -15,19 +18,21 @@ class ExperimentNode(django.template.Node):
 
     def render(self, context):
         if "request" not in context:
-            raise TemplateSyntaxError(
-                "Use of splangotags requires the request context processor. "
-                "Please add django.core.context_processors.request to your "
-                "settings.TEMPLATE_CONTEXT_PROCESSORS.")
+            msg = ("Use of splangotags requires the request context processor. "
+                   "Please add django.core.context_processors.request to your "
+                   "settings.TEMPLATE_CONTEXT_PROCESSORS.")
+            logger.error(msg)
+            raise TemplateSyntaxError(msg)
 
         request = context["request"]
         exp_manager = request.experiments_manager
 
         if not exp_manager:
-            raise TemplateSyntaxError(
-                "Use of splangotags requires the splango middleware. Please "
-                "add splango.middleware.ExperimentsMiddleware to your "
-                "settings.MIDDLEWARE_CLASSES.")
+            msg = ("Use of splangotags requires the splango middleware. Please "
+                   "add splango.middleware.ExperimentsMiddleware to your "
+                   "settings.MIDDLEWARE_CLASSES.")
+            logger.error(msg)
+            raise TemplateSyntaxError(msg)
 
         exp_variant = exp_manager.declare_and_enroll(self.exp_name,
                                                      self.variants)
@@ -53,10 +58,11 @@ class HypNode(django.template.Node):
         ctx_var = CTX_PREFIX + self.exp_name
 
         if ctx_var not in context:
-            raise TemplateSyntaxError(
-                "Experiment %s has not yet been declared. Please declare it "
-                "and supply variant names using an experiment tag before "
-                "using hyp tags.")
+            msg = ("Experiment %s has not yet been declared. Please declare it "
+                   "and supply variant names using an experiment tag before "
+                   "using hyp tags.")
+            logger.error(msg)
+            raise TemplateSyntaxError(msg)
 
         if self.exp_variant == context[ctx_var].name:
             return self.node_list.render(context)
@@ -75,10 +81,11 @@ def experiment(parser, token):
     try:
         tag_name, exp_name, variants_label, variant_str = token.split_contents()
     except ValueError:
-        raise TemplateSyntaxError(
-            '%r tag requires exactly three arguments, e.g. {% experiment '
-            '"signuptext" variants "control,free,trial" %}' %
-            token.contents.split()[0])
+        tag_name = token.contents.split()[0]
+        msg = ('%r tag requires exactly three arguments, e.g. {% experiment '
+               '"signuptext" variants "control,free,trial" %}' % tag_name)
+        logger.error(msg)
+        raise TemplateSyntaxError(msg)
 
     return ExperimentNode(exp_name.strip("\"'"),
                           variant_str.strip("\"'").split(","))
@@ -89,8 +96,10 @@ def hyp(parser, token):
     try:
         tag_name, exp_name, exp_variant = token.split_contents()
     except ValueError:
-        raise TemplateSyntaxError(
-            "%r tag requires exactly two arguments" % token.contents.split()[0])
+        tag_name = token.contents.split()[0]
+        msg = "%r tag requires exactly two arguments" % tag_name
+        logger.error(msg)
+        raise TemplateSyntaxError(msg)
 
 #     print "*** hyp looking for next tag"
     #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]

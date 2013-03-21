@@ -163,7 +163,7 @@ class Experiment(models.Model):
             :mod:`random`. Debugging we could see that the instance's internal
             state was always the same, thus the output will not be random!
 
-            Also, :method:`random.Random.jumpahead` seemed to be the solution
+            Also, :meth:`random.Random.jumpahead` seemed to be the solution
             but it is not recommended and was removed in Python 3.
 
         :return: variant
@@ -241,7 +241,7 @@ class ExperimentReport(models.Model):
         count too.
 
         :returns: A dict with goals, variants and variants counts associated
-        to each goal
+          to each goal
 
         """
         result = []

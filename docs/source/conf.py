@@ -18,6 +18,14 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
+DOCS_DIR = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(DOCS_DIR, os.pardir, os.pardir))
+sys.path.insert(1, DOCS_DIR)  # to use 'utils.py'
+
+from .utils import fix_django_settings
+fix_django_settings()
+
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

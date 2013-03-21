@@ -22,6 +22,7 @@ def is_first_visit(request):
     """Tell whether it is the first visit by ``request``'s visitor.
 
     Current algorithm is very basic. It performs the following nested checks:
+
     * if ``user`` in ``request`` is authenticated
     * if there is a HTTP_REFERER
     * if ``request``'s host matches the referer

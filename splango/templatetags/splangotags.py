@@ -48,8 +48,10 @@ class ExperimentNode(django.template.Node):
     def render(self, context):
         """Declare the experiment and enroll a variant. Render nothing.
 
-        :param context:
+        :param context: template context
+        :type context: :class:`django.template.context.Context`
         :return: empty string
+        :rtype: basestring
         :raises: :class:`django.template.TemplateSyntaxError` if ``'request'``
           is not in ``context``, or if the former does not have an experiments
           manager.
@@ -77,6 +79,13 @@ class ExperimentNode(django.template.Node):
 
 class HypNode(django.template.Node):
 
+    """Template node for a ``{% hyp %}`` template tag.
+
+    This :meth:`render` method of this class either returns an empty string
+    or the inner nodes rendered.
+
+    """
+
     def __init__(self, exp_name, exp_variant, node_list):
         self.exp_name = exp_name
         self.exp_variant = exp_variant
@@ -88,6 +97,16 @@ class HypNode(django.template.Node):
         logger.debug(msg)
 
     def render(self, context):
+        """Render the node list if :attr:`exp_variant` is the enrolled variant.
+
+        :param context: template context
+        :type context: :class:`django.template.context.Context`
+        :return: :attr:`node_list` rendered or an empty string
+        :rtype: basestring
+        :raises: :class:`django.template.TemplateSyntaxError` if the experiment
+          named :attr:`exp_name` has not been declared yet
+
+        """
         msg = ("Rendering HypNode. exp name: %s, exp variant: %s" %
                (self.exp_name, self.exp_variant))
         logger.debug(msg)

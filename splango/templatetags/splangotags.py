@@ -157,7 +157,7 @@ def experiment(parser, token):
 
     """
     try:
-        tag_name, exp_name, variants_label, variant_str = token.split_contents()
+        tag_name, exp_name, variants_label, variants_str = token.split_contents()
     except ValueError:
         tag_name = token.contents.split()[0]
         msg = ('%r tag requires exactly three arguments, e.g. {%% experiment '
@@ -166,8 +166,8 @@ def experiment(parser, token):
         raise TemplateSyntaxError(msg)
 
     clean_exp_name = exp_name.strip("\"'")
-    clean_variant_str = variant_str.strip("\"'")
-    return ExperimentNode(clean_exp_name, clean_variant_str)
+    clean_variants_str = variants_str.strip("\"'")
+    return ExperimentNode(clean_exp_name, clean_variants_str)
 
 
 @register.tag

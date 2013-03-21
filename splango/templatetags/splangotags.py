@@ -36,9 +36,18 @@ class ExperimentNode(django.template.Node):
 
     """
 
-    def __init__(self, exp_name, variants):
+    def __init__(self, exp_name, variants_str):
+        """Save the experiment and variants names, splitting ``variants_str``.
+
+        :attr:`variants` is a list of strings, the name of each variant
+
+        :param exp_name: experiment name
+        :param variants_str: variants names concatenated by ``","`` e.g.
+          ``"red,blue,green"``
+
+        """
         self.exp_name = exp_name
-        self.variants = variants
+        self.variants = [v for v in variants_str.split(",") if v]
 
         msg = ("Instantiated ExperimentNode"
                "\nexp name: %s, exp variants: %s " %

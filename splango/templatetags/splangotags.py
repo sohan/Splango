@@ -195,15 +195,9 @@ def hyp(parser, token):
         logger.error(msg)
         raise TemplateSyntaxError(msg)
 
-#     print "*** hyp looking for next tag"
-    #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
-
+    # parse until "endhyp" and then remove that token from parser
     node_list = parser.parse(("endhyp",))
-    token = parser.next_token()
-
-#     print " * hyp FOUND TOKEN %s" % token.contents
-    parser.delete_first_token()
-    #print "parser.tokens = %r" % [ t.contents for t in parser.tokens ]
+    parser.next_token()
 
     clean_exp_name = exp_name.strip("\"'")
     clean_variant_name = exp_variant.strip("\"'")

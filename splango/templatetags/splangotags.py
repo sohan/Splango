@@ -47,7 +47,7 @@ class ExperimentNode(django.template.Node):
 
         """
         self.exp_name = exp_name
-        self.variants = [v for v in variants_str.split(",") if v]
+        self.variants = [v.strip() for v in variants_str.split(",") if v]
 
         msg = ("Instantiated ExperimentNode"
                "\nexp name: %s, exp variants: %s " %

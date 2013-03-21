@@ -1,14 +1,105 @@
+<style>
+    div.separator {
+        background: grey;
+    }
+
+    div.blue {
+        background: royalblue;
+    }
+
+    div.red {
+        background: palevioletred;
+    }
+
+    div.green {
+        background: mediumseagreen;
+    }
+
+    div.yellow {
+        background: yellow;
+    }
+</style>
+
 {% block content %}
 	{% load splangotags %}
 
 
-	{% experiment "sample_experiment" variants "red,blue" %}
+	{% experiment "sample_experiment" variants "red,blue,yellow,green" %}
 
 	{% hyp "sample_experiment" "blue" %}
-		<p id="sample_text">Blue!</p>
+        <div class="blue">
+            <p id="sample_text">Blue!</p>
+            <form>
+              <fieldset>
+                <legend>Legend</legend>
+                <label>Label name</label>
+                <input type="text" placeholder="Type something…">
+                <span class="help-block">Example block-level help text here.</span>
+                <label class="checkbox">
+                  <input type="checkbox"> Check me out
+                </label>
+                <button type="submit" class="btn">Submit</button>
+              </fieldset>
+            </form>
+        </div>
 	{% endhyp %}
+    <div class="separator"><p>x</p></div>
 	{% hyp "sample_experiment" "red" %}
-		<p id="sample_text">Red</p>
-	{% endhyp %}
+        <div class="red">
 
+        {% spaceless %}
+            <p>
+                <a href="foo/">Foo</a>
+            </p>
+        {% endspaceless %}
+
+		<p id="sample_text">Red</p>
+
+        {% if cities %}
+            {% regroup cities by country as country_list %}
+
+            <ul>
+            {% for country in country_list %}
+                <li>{{ country.grouper }}
+                <ul>
+                    {% for item in country.list %}
+                      <li>{{ item.name }}: {{ item.population }}</li>
+                    {% endfor %}
+                </ul>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% comment %}
+            <p>Commented out text for testing</p>
+        {% endcomment %}
+        </div>
+	{% endhyp %}
+    <div class="separator"><p>x</p></div>
+    {% hyp "sample_experiment" "yellow" %}
+        <div class="yellow">
+		    <p id="sample_text">Yellow</p>
+        </div>
+	{% endhyp %}
+    <div class="separator"><p>x</p></div>
+    {% hyp "sample_experiment" "green" %}
+        <div class="green">
+
+        <p id="sample_text">Greeeeen</p>
+        {% if cities %}
+
+            <ul>
+            {% for city in cities %}
+                <li>{{ city.name }}
+                    <ul>
+                        <li>Population: {{ city.population }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        </div>
+    {% endhyp %}
+    <div class="separator"><p>x</p></div>
+    <p>Cities: {{ cities|length }}</p>
 {% endblock %}

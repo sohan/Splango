@@ -4,13 +4,11 @@
 
 	{% experiment "sample_experiment" variants "red,blue" %}
 
-    <p>
-        {% hyp "sample_experiment" "blue" %}
-            <p id="sample_text">Blue!</p>
-        {% endhyp %}
-        {% hyp "sample_experiment" "red" %}
-            <p id="sample_text">Red</p>
-        {% endhyp %}
-	</p>
+	{% hyp "sample_experiment" "blue" %}
+		<p id="sample_text">Blue!</p>
+	{% endhyp %}
+	{% hyp "sample_experiment" "red" %}
+		<p id="sample_text">Red</p>
+	{% endhyp %}
 
 {% endblock %}

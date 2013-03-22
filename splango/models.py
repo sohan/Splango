@@ -66,6 +66,17 @@ class Subject(models.Model):
 
         self.delete()
 
+    def is_registered_user(self):
+        """Is this subject associated to a registered user?
+
+        :return: True if subject is a registered user i.e. associated to a
+          :class:`django.contrib.auth.models.User`
+        :rtype: bool
+
+        """
+        return self.registered_as is not None
+    is_registered_user.boolean = True
+
 
 class GoalRecord(models.Model):
 

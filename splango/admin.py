@@ -4,7 +4,15 @@ from .models import (Subject, Goal, GoalRecord, Enrollment, Experiment,
                      ExperimentReport, Variant)
 
 
-admin.site.register(Subject)
+class SubjectAdmin(admin.ModelAdmin):
+
+    list_display = (
+        '__unicode__', 'registered_as', 'is_registered_user', 'created')
+    list_filter = ('created',)
+    date_hierarchy = 'created'
+
+
+admin.site.register(Subject, SubjectAdmin)
 
 
 class GoalAdmin(admin.ModelAdmin):

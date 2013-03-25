@@ -12,5 +12,5 @@ urlpatterns = patterns(
 
     url(r'^example/', include('myapp.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'splango/', include('splango.urls')),
+    url(r'^splango/', include('splango.urls')),
 )

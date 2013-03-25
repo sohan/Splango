@@ -1,11 +1,12 @@
 {% extends 'admin/base.html' %}
 {% load i18n %}
+{% load url from future %}
 
 {% block title %}Splango: {{title}}{% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url splango_admin %}">Splango</a>
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url 'splango_admin' %}">Splango</a>
 
-&rsaquo; <a href="{% url splango_experiment_detail exp_name=exp.name %}">{{exp.name}}</a>
+&rsaquo; <a href="{% url 'splango_experiment_detail' exp_name=exp.name %}">{{exp.name}}</a>
 
 {% if title %} &rsaquo; {{ title }}{% endif %}
 </div>{% endblock %}

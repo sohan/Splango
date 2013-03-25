@@ -1,10 +1,10 @@
-from django.conf.urls import *
+from django.conf.urls import patterns, include, url
 
 from splango import views
 
 
 urlpatterns = patterns(
-
+    '',
     url(r'^admin/$',
         views.experiments_overview,
         name="splango_admin"),

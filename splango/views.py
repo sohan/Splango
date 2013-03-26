@@ -66,7 +66,7 @@ def experiment_log(request, exp_name, variant, goal):
 
     enrollments = (
         Enrollment.objects
-        .filter(experiment=exp, variant=variant, subject__goals=goal)
+        .filter(experiment=exp, variant__name=variant, subject__goals=goal)
         .select_related("subject")[:1000]
     )
     # 1000 limit is just there to keep this page sane

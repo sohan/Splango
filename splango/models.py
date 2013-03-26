@@ -66,6 +66,17 @@ class Subject(models.Model):
 
         self.delete()
 
+    def is_registered_user(self):
+        """Is this subject associated to a registered user?
+
+        :return: True if subject is a registered user i.e. associated to a
+          :class:`django.contrib.auth.models.User`
+        :rtype: bool
+
+        """
+        return self.registered_as is not None
+    is_registered_user.boolean = True
+
 
 class GoalRecord(models.Model):
 
@@ -163,7 +174,7 @@ class Experiment(models.Model):
             :mod:`random`. Debugging we could see that the instance's internal
             state was always the same, thus the output will not be random!
 
-            Also, :method:`random.Random.jumpahead` seemed to be the solution
+            Also, :meth:`random.Random.jumpahead` seemed to be the solution
             but it is not recommended and was removed in Python 3.
 
         :return: variant
@@ -241,7 +252,7 @@ class ExperimentReport(models.Model):
         count too.
 
         :returns: A dict with goals, variants and variants counts associated
-        to each goal
+          to each goal
 
         """
         result = []

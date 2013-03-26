@@ -334,5 +334,10 @@ class Variant(models.Model):
     #                              help_text="The priority of the variant")
 
     def __unicode__(self):
-        return "%s (%s)" % (self.name, self.experiment)
+        # TODO: check that variant calls are correct
+        # Due to the `Variant` change from string to class, almost every
+        # part of this project is working with `variant` as a string.
+        # In order to continue working like that, ``__unicode__`` is returning
+        # ``self.name`` now.
+        return self.name
 

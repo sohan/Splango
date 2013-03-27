@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}Splango: Goal {{title}}{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">{% trans 'Home' %}</a> &rsaquo; <a href="{% url 'splango_admin' %}">Splango</a>
+
+{% if title %} &rsaquo; {{ title }}{% endif %}
+</div>{% endblock %}
+
+
+{% block content %}
+    <h3>Goal: {{ goal }}</h3>
+    <h3>Experiment: {{ experiment }}</h3>
+
+    {% if data %}
+    {% comment %}
+        If no data, i.e., goal record count is zero, then no data is presented.
+
+        In ``data`` comes the variant name, the goal records count, and
+        the percentage represented by the respective goal record.
+    {% endcomment %}
+    <h3>Variants:</h3>
+    <ul>
+        {% for variant, d in data.items %}
+            {% with variant_name=d.0 count=d.1 percentage=d.2 %}
+            <li>
+                <p>
+                    For variant "{{ variant_name }}" goal "{{ goal.name }}" is
+                    reached {{ count }} times, or {{ percentage }}% of time
+                </p>
+            </li>
+
+            {% endwith %}
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p><i>No data yet.</i></p>
+    {% endif %}
+{% endblock %}
+

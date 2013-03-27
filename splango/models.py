@@ -20,6 +20,42 @@ class Goal(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_records_count_per_variant(self, experiment):
+        """Get the goal records count and the respective percentage per
+        variant.
+
+         >> goal.get_records_count_per_variant(experiment)
+         {8: (1, 25.0), 1: (2, 50.0), 2: (0, 0.0), 6: (1, 25.0), 9: (0, 0.0)}
+
+        :param experiment:
+        :type experiment: :class:`Experiment`
+        :return: count of :class:`GoalRecord` objects and percentage for each
+            variant of ``experiment``
+        :rtype: dict
+
+        """
+        inner_qs = Enrollment.objects.filter(
+            variant__in=experiment.get_variants()).values('subject')
+        total = GoalRecord.objects.filter(
+            goal=self, subject__in=inner_qs).count()
+
+        if total == 0:
+            return total
+
+        # get the goal records per variant
+        gr_per_variant = {}
+
+        # for each variant, associates the count and the percentage
+        for v in experiment.get_variants():
+            gr_count_variant = v.get_goal_records(self).count()
+            if total > 0:
+                gr_percentage = (gr_count_variant * 100.0) / total
+            else:
+                gr_percentage = 0
+            gr_per_variant[v.pk] = (gr_count_variant, gr_percentage)
+
+        return gr_per_variant
+
 
 class Subject(models.Model):
 
@@ -340,4 +376,3 @@ class Variant(models.Model):
         # In order to continue working like that, ``__unicode__`` is returning
         # ``self.name`` now.
         return self.name
-

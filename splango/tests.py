@@ -73,8 +73,3 @@ def create_variant(**kwargs):
         defaults['experiment'] = create_experiment()
 
     return models.Variant.objects.create(**defaults)
-
-
-class GoalRecord(TestCase):
-
-    pass

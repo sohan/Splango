@@ -12,34 +12,7 @@ from selenium.webdriver.common.keys import Keys
 
 from splango import RequestExperimentManager
 from splango.models import (Experiment, Variant, Subject, Enrollment)
-
-
-def create_experiment(**kwargs):
-    defaults = {
-        'name': u'Experiment 1'
-    }
-    defaults.update(kwargs)
-    return Experiment.objects.create(**defaults)
-
-
-def create_subject(**kwargs):
-    defaults = {
-        #'user': None
-    }
-    defaults.update(kwargs)
-    return Subject.objects.create(**defaults)
-
-
-def create_variant(**kwargs):
-    defaults = {
-        'name': u'Variant 1'
-    }
-    defaults.update(kwargs)
-
-    if 'experiment' not in defaults:
-        defaults['experiment'] = create_experiment()
-
-    return Variant.objects.create(**defaults)
+from splango.tests import create_experiment, create_subject, create_variant
 
 
 class InitTest(TestCase):

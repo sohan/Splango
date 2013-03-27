@@ -1,8 +1,9 @@
+# coding: utf-8
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
-from .models import Enrollment, Experiment, ExperimentReport, Goal, GoalRecord
+from .models import Enrollment, Experiment, ExperimentReport, Goal, GoalRecord, Variant
 
 
 @staff_member_required
@@ -83,4 +84,56 @@ def experiment_log(request, exp_name, variant, goal):
 
     dictionary = {"exp": exp, "activities": activities, "title": title}
     return render_to_response("splango/experiment_log.html", dictionary,
+                              RequestContext(request))
+
+@staff_member_required
+def goal_report(request, goal_name):
+    """Goal results for all the variants.
+
+    :param goal_name: The name of the goal
+    :return:
+    """
+    goal = get_object_or_404(Goal, name=goal_name)
+
+    dictionary = {
+        "goal": goal,
+    }
+    return render_to_response("splango/goal_report.html", dictionary,
+                              RequestContext(request))
+
+@staff_member_required
+def experiment_goal_report(request, goal_name, exp_name):
+    """Goal results for all the variants in a experiment.
+
+    :param request:
+    :param exp_name: The name of the experiment
+    :param goal_name: The name of the goal
+    :return:
+    """
+    experiment = get_object_or_404(Experiment, name=exp_name)
+    goal = get_object_or_404(Goal, name=goal_name)
+
+    variants = experiment.get_variants()
+
+    count = goal.get_records_count_per_variant(experiment)
+
+    # if no count, then data is empty
+    if count:
+        data = {
+            key: (Variant.objects.get(pk=key).name, value[0], value[1])
+            for key, value in count.items()
+        }
+    else:
+        data = {}
+
+    ctx = {
+        "goal": goal,
+        "experiment": experiment,
+        "variants": variants,
+        "count": count,
+        "data": data,
+        "title": goal.name,
+    }
+
+    return render_to_response("splango/experiment_goal_report.html", ctx,
                               RequestContext(request))

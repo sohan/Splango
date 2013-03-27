@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-import django.contrib.auth.models as auth_models
-from django.contrib.auth import load_backend
-from django.test import LiveServerTestCase
-from django.utils.importlib import import_module
+from unittest import TestCase
 
 from mock import MagicMock
 from selenium import webdriver
-from unittest import TestCase
 from selenium.webdriver.common.keys import Keys
+
+from django.conf import settings
+from django.contrib.auth import load_backend
+import django.contrib.auth.models as auth_models
+from django.test import LiveServerTestCase
+from django.utils.importlib import import_module
 
 from splango import RequestExperimentManager
 from splango.models import (Experiment, Variant, Subject, Enrollment)

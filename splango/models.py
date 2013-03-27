@@ -169,6 +169,7 @@ class Enrollment(models.Model):
     experiment."""
 
     subject = models.ForeignKey('splango.Subject', editable=False)
+    # TODO: remove experiment because it is already present in variant
     experiment = models.ForeignKey('splango.Experiment', editable=False)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     variant = models.ForeignKey('splango.Variant')

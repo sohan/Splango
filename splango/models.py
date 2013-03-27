@@ -377,3 +377,15 @@ class Variant(models.Model):
         # In order to continue working like that, ``__unicode__`` is returning
         # ``self.name`` now.
         return self.name
+
+    def get_goal_records(self, goal):
+        """Return all the records of ``goal`` for this variant.
+
+        :param goal:
+        :type goal: :class:`Goal`
+        :return: the goal records
+        :rtype: queryset of :class:`GoalRecord`
+
+        """
+        subjects = Enrollment.objects.filter(variant=self).values('subject')
+        return GoalRecord.objects.filter(goal=goal, subject__in=subjects)

@@ -35,7 +35,7 @@ admin.site.register(GoalRecord, GoalRecordAdmin)
 
 class EnrollmentAdmin(admin.ModelAdmin):
     list_display = ("subject", "experiment", "variant", "created")
-    list_filter = ('experiment', 'variant', 'created')
+    list_filter = ('variant', 'created')
     date_hierarchy = 'created'
 
 

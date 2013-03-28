@@ -165,31 +165,42 @@ class GoalRecord(models.Model):
 
 class Enrollment(models.Model):
 
-    """Identifies which variant a subject is assigned to in a given
-    experiment."""
+    """Identifies which variant a subject is assigned to.
+
+    A variant belongs to an experiment, so it is unnecesary to treat as a field
+    here. The experiment is treated as a property instead.
+    """
 
     subject = models.ForeignKey('splango.Subject', editable=False)
-    # TODO: remove experiment because it is already present in variant
-    experiment = models.ForeignKey('splango.Experiment', editable=False)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     variant = models.ForeignKey('splango.Variant')
 
     class Meta:
-        unique_together = (('subject', 'experiment'),)
+        unique_together = (('subject', 'variant'),)
 
     def __unicode__(self):
         return (u"experiment '%s' subject #%d -- variant %s" %
                 (self.experiment.name, self.subject_id, self.variant))
 
+    @property
+    def experiment(self):
+        return self.variant.experiment
+
 
 class Experiment(models.Model):
 
-    """A named experiment."""
+    """A named experiment.
+
+    An experiment has a lot of variants, and a variant belongs to only one
+    experiment.
+
+    """
 
     name = models.CharField(max_length=_NAME_LENGTH, primary_key=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
-    subjects = models.ManyToManyField(Subject, through=Enrollment)
+    # moved to variant, variant has the experiment
+    # subjects = models.ManyToManyField(Subject, through=Enrollment)
 
     def __unicode__(self):
         return self.name
@@ -246,8 +257,7 @@ class Experiment(models.Model):
             variant = self.get_random_variant()
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
-            experiment=self,
-            defaults={"variant": variant}
+            variant=variant,
         )
         return enrollment
 
@@ -303,7 +313,7 @@ class ExperimentReport(models.Model):
         for v in variants:
             # variant_counts.append(exp.subjectvariant_set.filter(variant=v).\
             #     aggregate(ct=Count("variant")).get("ct",0))
-            val = Enrollment.objects.filter(experiment=exp, variant=v).count()
+            val = Enrollment.objects.filter(variant=v).count()
             variant_counts.append(dict(
                 val=val,
                 variant_name=v,
@@ -327,7 +337,7 @@ class ExperimentReport(models.Model):
             for vi, v in enumerate(variants):
                 if goal:
                     vcount = Enrollment.objects.filter(
-                        experiment=exp, variant=v, subject__goals=goal).count()
+                        variant=v, subject__goals=goal).count()
                     prev_count = result[previ]["variant_counts"][vi]["val"]
 
                     if prev_count == 0:
@@ -365,6 +375,8 @@ class Variant(models.Model):
 
     experiment = models.ForeignKey('splango.Experiment',
                                    related_name="variants")
+
+    subjects = models.ManyToManyField(Subject, through=Enrollment)
 
     name = models.CharField(max_length=_NAME_LENGTH, blank=True)
     # weight = models.IntegerField(null=True, blank=True,

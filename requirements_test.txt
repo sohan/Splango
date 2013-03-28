@@ -1,0 +1,4 @@
+-r requirements.txt
+
+mock==1.0.1
+selenium==2.31.0

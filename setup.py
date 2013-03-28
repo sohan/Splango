@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from distutils.core import setup
 
-# from debug-toolbar!
 
 setup(
     name='Splango',
@@ -10,10 +9,6 @@ setup(
     author='Shimon Rura',
     author_email='shimon@rura.org',
     url='http://github.com/shimon/Splango',
-    packages=find_packages(exclude=('tests', 'example')),
-    package_data={'splango': ['templates/*.html', 'templates/*/*.html']},
-    tests_require=[
-        'django>=1.3,<1.5',
-    ],
-    test_suite='runtests.runtests',
+    packages=['splango', 'splango.templatetags'],
+    package_data={'splango': ['templates/*.html', 'templates/*/*.html']}
 )

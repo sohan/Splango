@@ -6,17 +6,17 @@ from splango.tests import (
     create_experiment, create_experiment_report, create_variant)
 
 
-class Goal(TestCase):
+class GoalTest(TestCase):
 
     pass
 
 
-class Subject(TestCase):
+class SubjectTest(TestCase):
 
     pass
 
 
-class GoalRecord(TestCase):
+class GoalRecordTest(TestCase):
 
     def test_unique_together(self):
         goal = create_goal()
@@ -27,7 +27,7 @@ class GoalRecord(TestCase):
             IntegrityError, create_goal_record, goal=goal, subject=subject)
 
 
-class Enrollment(TestCase):
+class EnrollmentTest(TestCase):
 
     def test_unique_together(self):
         var = create_variant()
@@ -38,16 +38,16 @@ class Enrollment(TestCase):
             IntegrityError, create_enrollment, variant=var, subject=subject)
 
 
-class Experiment(TestCase):
+class ExperimentTest(TestCase):
 
     pass
 
 
-class ExperimentReport(TestCase):
+class ExperimentReportTest(TestCase):
 
     pass
 
 
-class Variant(TestCase):
+class VariantTest(TestCase):
 
     pass

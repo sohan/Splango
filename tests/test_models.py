@@ -1,6 +1,7 @@
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
+from splango.models import Experiment, Subject, GoalRecord
 from splango.tests import (
     create_goal, create_goal_record, create_subject, create_enrollment,
     create_experiment, create_experiment_report, create_variant)
@@ -36,6 +37,16 @@ class EnrollmentTest(TestCase):
 
         self.assertRaises(
             IntegrityError, create_enrollment, variant=var, subject=subject)
+
+    def test_unicode(self):
+        enrollment = create_enrollment()
+        self.assertEqual(
+            "experiment 'My experiment' subject #1 -- variant A variant",
+            enrollment.__unicode__())
+
+    def test_experiment(self):
+        enrollment = create_enrollment()
+        self.assertIsInstance(enrollment.experiment, Experiment)
 
 
 class ExperimentTest(TestCase):

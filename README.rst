@@ -1,11 +1,14 @@
-# Splango: Drop-in Split Testing for Django
+========================================
+Splango: Drop-in Split Testing for Django
+========================================
 
 Splango is designed to help you take the first steps with split (A/B)
 testing with minimal friction.  It allows you to instantly declare and run a
 split test experiment in your templates or in python code, and provides an
 admin UI for viewing simple funnel reports on the results.
 
-## Template Example
+Template Example
+====================
 
     {% load splangotags %}
 
@@ -30,7 +33,8 @@ admin UI for viewing simple funnel reports on the results.
     </a>
 
 
-## Python View Example
+Python View Example
+====================
 
     def mypage(request):
         exp_manager = request.experiments_manager
@@ -58,7 +62,8 @@ admin UI for viewing simple funnel reports on the results.
            RequestContext(request))
 
 
-## Things to Note
+Things to Note
+====================
 
 * In order to filter out bots, Splango injects a javascript fragment into
   your HTTP response. Only clients that have a Django session and can run
@@ -72,7 +77,8 @@ admin UI for viewing simple funnel reports on the results.
   human, as long as we can identify them.
 
 
-## Installation
+Installation
+====================
 
 * Ensure you have the dependencies:
   * django's session package
@@ -109,7 +115,8 @@ admin UI for viewing simple funnel reports on the results.
 * Finally, go to /splango/admin to create and view experiments.
 
 
-## Usage Notes
+Usage Notes
+====================
 
 * The names of experiments and goals are their sole identifier. This keeps
   things simple, but also means that typos can mess things up.

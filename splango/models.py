@@ -113,6 +113,21 @@ class Subject(models.Model):
         return self.registered_as is not None
     is_registered_user.boolean = True
 
+    def get_variants(self):
+        """Return all the variants shown to this subject.
+
+        The relationship is established through :class:`Enrollment`, which
+        has foreign keys to both :class:`Variant` and :class:`Subject`.
+
+        .. seealso::
+            See analogous method :meth:`Variant.get_subjects`.
+
+        :return: the variants
+        :rtype: queryset of :class:`Variant`
+
+        """
+        return Enrollment.objects.filter(subject=self).values('variant')
+
 
 class GoalRecord(models.Model):
 

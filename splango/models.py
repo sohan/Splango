@@ -376,8 +376,6 @@ class Variant(models.Model):
     experiment = models.ForeignKey('splango.Experiment',
                                    related_name="variants")
 
-    subjects = models.ManyToManyField(Subject, through=Enrollment)
-
     name = models.CharField(max_length=_NAME_LENGTH, blank=True)
     # weight = models.IntegerField(null=True, blank=True,
     #                              help_text="The priority of the variant")
@@ -390,6 +388,18 @@ class Variant(models.Model):
         # ``self.name`` now.
         return self.name
 
+    def get_subjects(self):
+        """Return all the subjects to whom this variant was shown.
+
+        The relationship is established through :class:`Enrollment`, which
+        has foreign keys to both :class:`Variant` and :class:`Subject`.
+
+        :return: the subjects
+        :rtype: queryset of :class:`Subject`
+
+        """
+        return Enrollment.objects.filter(variant=self).values('subject')
+
     def get_goal_records(self, goal):
         """Return all the records of ``goal`` for this variant.
 
@@ -399,5 +409,5 @@ class Variant(models.Model):
         :rtype: queryset of :class:`GoalRecord`
 
         """
-        subjects = Enrollment.objects.filter(variant=self).values('subject')
+        subjects = self.get_subjects()
         return GoalRecord.objects.filter(goal=goal, subject__in=subjects)

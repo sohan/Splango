@@ -20,6 +20,17 @@ class Goal(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_records_total(self, experiment):
+        """Get the goal records total for an experiment, including all its
+        variants
+
+        """
+        inner_qs = Enrollment.objects.filter(
+            variant__in=experiment.get_variants()).values('subject')
+
+        return GoalRecord.objects.filter(
+            goal=self, subject__in=inner_qs).count()
+
     def get_records_count_per_variant(self, experiment):
         """Get the goal records count and the respective percentage per
         variant.
@@ -34,10 +45,7 @@ class Goal(models.Model):
         :rtype: dict
 
         """
-        inner_qs = Enrollment.objects.filter(
-            variant__in=experiment.get_variants()).values('subject')
-        total = GoalRecord.objects.filter(
-            goal=self, subject__in=inner_qs).count()
+        total = self.get_records_total(experiment)
 
         if total == 0:
             return total

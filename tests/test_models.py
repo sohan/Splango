@@ -29,7 +29,13 @@ class GoalRecord(TestCase):
 
 class Enrollment(TestCase):
 
-    pass
+    def test_unique_together(self):
+        var = create_variant()
+        subject = create_subject()
+        create_enrollment(variant=var, subject=subject)
+
+        self.assertRaises(
+            IntegrityError, create_enrollment, variant=var, subject=subject)
 
 
 class Experiment(TestCase):

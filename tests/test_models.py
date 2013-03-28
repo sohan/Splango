@@ -17,7 +17,13 @@ class Subject(TestCase):
 
 class GoalRecord(TestCase):
 
-    pass
+    def test_unique_together(self):
+        goal = create_goal()
+        subject = create_subject()
+        create_goal_record(goal=goal, subject=subject)
+
+        self.assertRaises(
+            ValueError, create_goal_record, goal=goal, subject=subject)
 
 
 class Enrollment(TestCase):

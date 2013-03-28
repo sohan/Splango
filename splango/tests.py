@@ -23,7 +23,7 @@ def create_subject(**kwargs):
 
 
 def create_goal_record(**kwargs):
-    defaults = {}
+    defaults = {'req_REMOTE_ADDR': ''}
     defaults.update(kwargs)
 
     if 'goal' not in defaults:

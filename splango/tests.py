@@ -40,8 +40,6 @@ def create_enrollment(**kwargs):
 
     if 'subject' not in defaults:
         defaults['subject'] = create_subject()
-    if 'experiment' not in defaults:
-        defaults['experiment'] = create_experiment()
     if 'variant' not in defaults:
         defaults['variant'] = create_variant()
 

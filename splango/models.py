@@ -409,6 +409,9 @@ class Variant(models.Model):
         The relationship is established through :class:`Enrollment`, which
         has foreign keys to both :class:`Variant` and :class:`Subject`.
 
+        .. seealso::
+            See analogous method :meth:`Subject.get_variants`.
+
         :return: the subjects
         :rtype: queryset of :class:`Subject`
 

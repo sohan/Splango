@@ -42,6 +42,8 @@ def create_enrollment(**kwargs):
         defaults['subject'] = create_subject()
     if 'variant' not in defaults:
         defaults['variant'] = create_variant()
+    if 'experiment' not in defaults:
+        defaults['experiment'] = create_experiment()
 
     return models.Enrollment.objects.create(**defaults)
 

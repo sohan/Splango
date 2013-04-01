@@ -188,26 +188,25 @@ class GoalRecord(models.Model):
 
 class Enrollment(models.Model):
 
-    """Identifies which variant a subject is assigned to.
-
-    A variant belongs to an experiment, so it is unnecesary to treat as a field
-    here. The experiment is treated as a property instead.
-    """
+    """Identifies which variant a subject is assigned to in a given
+    experiment."""
 
     subject = models.ForeignKey('splango.Subject', editable=False)
+    # TODO: remove experiment because it is already present in variant
+    # Note: For now, we will keep experiment as a field in Enrollment, even
+    # knowing that it produces an denormalized database structure.
+    # Experiment present as a field is required to get a unique subject in only
+    # one experiment, as declared at line 205
+    experiment = models.ForeignKey('splango.Experiment', editable=False)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     variant = models.ForeignKey('splango.Variant')
 
     class Meta:
-        unique_together = (('subject', 'variant'),)
+        unique_together = (('subject', 'experiment'),)
 
     def __unicode__(self):
         return (u"experiment '%s' subject #%d -- variant %s" %
                 (self.experiment.name, self.subject_id, self.variant))
-
-    @property
-    def experiment(self):
-        return self.variant.experiment
 
 
 class Experiment(models.Model):
@@ -280,7 +279,8 @@ class Experiment(models.Model):
             variant = self.get_random_variant()
         enrollment, created = Enrollment.objects.get_or_create(
             subject=subject,
-            variant=variant,
+            experiment=self,
+            defaults={"variant": variant}
         )
         return enrollment
 
@@ -336,7 +336,7 @@ class ExperimentReport(models.Model):
         for v in variants:
             # variant_counts.append(exp.subjectvariant_set.filter(variant=v).\
             #     aggregate(ct=Count("variant")).get("ct",0))
-            val = Enrollment.objects.filter(variant=v).count()
+            val = Enrollment.objects.filter(experiment=exp, variant=v).count()
             variant_counts.append(dict(
                 val=val,
                 variant_name=v,
@@ -360,7 +360,7 @@ class ExperimentReport(models.Model):
             for vi, v in enumerate(variants):
                 if goal:
                     vcount = Enrollment.objects.filter(
-                        variant=v, subject__goals=goal).count()
+                        experiment=exp, variant=v, subject__goals=goal).count()
                     prev_count = result[previ]["variant_counts"][vi]["val"]
 
                     if prev_count == 0:

@@ -22,19 +22,27 @@ class GoalTest(TestCase):
         self.variant4 = create_variant(name='variant4', experiment=self.exp)
 
         # create some enrollments
-        create_enrollment(variant=self.variant4)
-        create_enrollment(variant=self.variant4)
-        create_enrollment(variant=self.variant1)
-        create_enrollment(variant=self.variant2)
-        create_enrollment(variant=self.variant4)
-        create_enrollment(variant=self.variant1, subject=self.subject1)
-        create_enrollment(variant=self.variant1, subject=self.subject2)
-        create_enrollment(variant=self.variant2, subject=self.subject3)
-        create_enrollment(variant=self.variant2, subject=self.subject4)
-        self.e01 = create_enrollment(variant=self.variant3)
-        self.e02 = create_enrollment(variant=self.variant4)
-        self.e03 = create_enrollment(variant=self.variant4)
-        self.e04 = create_enrollment(variant=self.variant4)
+        create_enrollment(variant=self.variant4, experiment=self.exp)
+        create_enrollment(variant=self.variant4, experiment=self.exp)
+        create_enrollment(variant=self.variant1, experiment=self.exp)
+        create_enrollment(variant=self.variant2, experiment=self.exp)
+        create_enrollment(variant=self.variant4, experiment=self.exp)
+        create_enrollment(
+            variant=self.variant1, subject=self.subject1, experiment=self.exp)
+        create_enrollment(
+            variant=self.variant1, subject=self.subject2, experiment=self.exp)
+        create_enrollment(
+            variant=self.variant2, subject=self.subject3, experiment=self.exp)
+        create_enrollment(
+            variant=self.variant2, subject=self.subject4, experiment=self.exp)
+        self.e01 = create_enrollment(
+            variant=self.variant3, experiment=self.exp)
+        self.e02 = create_enrollment(
+            variant=self.variant4, experiment=self.exp)
+        self.e03 = create_enrollment(
+            variant=self.variant4, experiment=self.exp)
+        self.e04 = create_enrollment(
+            variant=self.variant4, experiment=self.exp)
 
         self.subject01 = self.e01.subject
         self.subject02 = self.e02.subject
@@ -130,22 +138,37 @@ class GoalRecordTest(TestCase):
 
 class EnrollmentTest(TestCase):
 
+    def setUp(self):
+        self.variant = create_variant()
+        self.subject = create_subject()
+        self.experiment = self.variant.experiment
+
     def test_unique_together(self):
-        var = create_variant()
-        subject = create_subject()
-        create_enrollment(variant=var, subject=subject)
+        var = self.variant
+        subject = self.subject
+        create_enrollment(
+            variant=var, subject=subject, experiment=var.experiment)
 
         self.assertRaises(
             IntegrityError, create_enrollment, variant=var, subject=subject)
 
     def test_unicode(self):
-        enrollment = create_enrollment()
+        var = self.variant
+        subject = self.subject
+        enrollment = create_enrollment(
+            variant=var, subject=subject, experiment=var.experiment)
+
         self.assertEqual(
             "experiment 'My experiment' subject #1 -- variant A variant",
             enrollment.__unicode__())
 
     def test_experiment(self):
-        enrollment = create_enrollment()
+        var = self.variant
+        subject = self.subject
+
+        enrollment = create_enrollment(variant=var, subject=subject,
+                                       experiment=var.experiment)
+
         self.assertIsInstance(enrollment.experiment, Experiment)
 
 

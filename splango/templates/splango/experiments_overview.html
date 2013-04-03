@@ -18,13 +18,40 @@
 <ul>
   {% for exp in experiments %}
   <li><a href="{% url 'splango_experiment_detail' exp_name=exp.name %}">{{exp}}</a>
-    {% if exp.reports %}
     <ul>
-      {% for report in exp.reports %}
-      <li><a href="{% url 'splango_experiment_report' report_id=report.id %}">{{report.title}}</a></li>
-      {% endfor %}
-    </ul>
+    {% if exp.reports %}
+      <li>
+          <span>Experiment Reports</span>
+          <ul>
+          {% for report in exp.reports %}
+              <li>
+                <a href="{% url 'splango_experiment_report' report_id=report.id %}">
+                    {{report.title}}
+                </a>
+              </li>
+          {% endfor %}
+          </ul>
+      </li>
     {% endif %}
+    {% if goals %}
+        <li>
+            <span>Experiment Goal Reports</span>
+            <ul>
+            {% for goal in goals %}
+                <li>
+                    <a href="{% url 'splango_experiment_goal_report' goal_name=goal.name exp_name=exp.name %}">
+                        {{ goal }}
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </li>
+    {% else %}
+        <li>No goals yet.</li>
+    {% endif %}
+    </ul>
+
+
   </li>
   {% endfor %}
 </ul>

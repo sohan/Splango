@@ -21,20 +21,24 @@
         In ``data`` comes the variant name, the goal records count, and
         the percentage represented by the respective goal record.
     {% endcomment %}
-    <h3>Variants:</h3>
-    <ul>
-        {% for variant, d in data.items %}
-            {% with variant_name=d.0 count=d.1 percentage=d.2 %}
-            <li>
-                <p>
-                    For variant "{{ variant_name }}" goal "{{ goal.name }}" is
-                    reached {{ count }} times, or {{ percentage }}% of time
-                </p>
-            </li>
-
-            {% endwith %}
-        {% endfor %}
-    </ul>
+        <table>
+            <thead>
+                <th>Variant</th>
+                <th>Count (times achieved)</th>
+                <th>%</th>
+            </thead>
+            <tbody>
+                {% for variant, d in data.items %}
+                <tr class="{% cycle 'row1' 'row2' as rowcolors %}">
+                    {% with variant_name=d.0 count=d.1 percentage=d.2 %}
+                    <td>{{ variant_name }}</td>
+                    <td class="align-right">{{ count }}</td>
+                    <td class="align-right">{{ percentage }}</td>
+                    {% endwith %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <p><i>No data yet.</i></p>
     {% endif %}

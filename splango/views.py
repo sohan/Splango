@@ -13,14 +13,22 @@ def experiments_overview(request):
     reports = ExperimentReport.objects.all()
     reports_by_id = dict()
 
+    goals = Goal.objects.all()
+
     for r in reports:
         reports_by_id.setdefault(r.experiment_id, []).append(r)
     for e in experiments:
         e.reports = reports_by_id.get(e.name, [])
 
+    context = {
+        "title": "Experiments",
+        "experiments": experiments,
+        "goals": goals,
+    }
+
     return render_to_response(
         "splango/experiments_overview.html",
-        {"title": "Experiments", "experiments": experiments},
+        context,
         RequestContext(request))
 
 

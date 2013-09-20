@@ -98,11 +98,17 @@ class RequestExperimentManager:
         sub = subject
         return sub
 
-    def declare_and_enroll(self, exp_name, variants):
+    def declare_and_enroll(self, exp_name, variants, selected_variant=None):
+        '''
+        declare an experiment, and enroll the user in a variant
+
+        the variant is chosen randomly from variants,
+        or if selected_variant is supplied, from selected_variant.
+        '''
         exp = Experiment.declare(exp_name, variants)
 
         subject = self.get_subject()
-        subject_variant = exp.get_or_create_enrollment(subject)
+        subject_variant = exp.get_or_create_enrollment(subject, variant=selected_variant)
         variant = subject_variant.variant
         logger.info("got variant %s for subject %s" %
                     (str(variant), str(subject)))

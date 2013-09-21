@@ -46,13 +46,8 @@ class ExperimentNode(django.template.Node):
           ``"red,blue,green"``
 
         """
-        self.exp_name = exp_name
-        self.variants = [v.strip() for v in variants_str.split(",") if v]
-
-        msg = ("Instantiated ExperimentNode"
-               "\nexp name: %s, exp variants: %s " %
-               (self.exp_name, self.variants))
-        logger.debug(msg)
+        self.exp_name_var = django.template.Variable(exp_name)
+        self.variants_str_var = django.template.Variable(variants_str)
 
     def render(self, context):
         """Declare the experiment and enroll a variant. Render nothing.
@@ -76,11 +71,17 @@ class ExperimentNode(django.template.Node):
             logger.error(SPLANGO_MIDDLEWARE_WARNING)
             raise TemplateSyntaxError(SPLANGO_MIDDLEWARE_WARNING)
 
-        variant = exp_manager.declare_and_enroll(self.exp_name, self.variants)
-        context[CTX_PREFIX + self.exp_name] = variant
+        #resolve template vars, throws an error
+        exp_name = self.exp_name_var.resolve(context)
+        variants = self.variants_str_var.resolve(context)
+        variants = [v.strip() for v in variants.split(u',')]
+
+
+        variant = exp_manager.declare_and_enroll(exp_name, variants)
+        context[CTX_PREFIX + exp_name] = variant
         msg = ("Completed ExperimentNode.render"
                "\nexp name: %s, exp variants: %s, enrolled variant: %s" %
-               (self.exp_name, self.variants, variant))
+               (exp_name, variants, variant))
         logger.debug(msg)
 
         return ""
@@ -96,14 +97,10 @@ class HypNode(django.template.Node):
     """
 
     def __init__(self, exp_name, exp_variant, node_list):
-        self.exp_name = exp_name
-        self.exp_variant = exp_variant
-        self.node_list = node_list
+        self.exp_name_var = django.template.Variable(exp_name)
+        self.exp_variant_var = django.template.Variable(exp_variant)
 
-        msg = ("Instantiated HypNode"
-               "\nexp name: %s, exp variant: %s\nnode list:\n%s" %
-               (self.exp_name, self.exp_variant, self.node_list))
-        logger.debug(msg)
+        self.node_list = node_list
 
     def render(self, context):
         """Render the node list if :attr:`exp_variant` is the enrolled variant.
@@ -116,29 +113,45 @@ class HypNode(django.template.Node):
           named :attr:`exp_name` has not been declared yet
 
         """
+
+        #resolve template vars, throws an error
+        exp_name = self.exp_name_var.resolve(context)
+        exp_variant = self.exp_variant_var.resolve(context)
+
         msg = ("Rendering HypNode. exp name: %s, exp variant: %s" %
-               (self.exp_name, self.exp_variant))
+               (exp_name, exp_variant))
         logger.debug(msg)
 
         enrolled_variant_name = self._get_enrolled_variant_name(context)
         logger.debug("enrolled variant name %s" % enrolled_variant_name)
 
-        if self.exp_variant == enrolled_variant_name:
+        if exp_variant == enrolled_variant_name:
             # render the contents within {% hyp %} and {% endhyp %}
             return self.node_list.render(context)
         else:
             # render nothing and the contents are discarded
             logger.debug("HypNode(%s, %s) not rendered" %
-                         (self.exp_name, self.exp_variant))
+                         (exp_name, exp_variant))
             return ""
 
     def _get_enrolled_variant_name(self, context):
-        ctx_var = CTX_PREFIX + self.exp_name
+        exp_name = self.exp_name_var.resolve(context)
+        ctx_var = CTX_PREFIX + exp_name
         if ctx_var not in context:
             logger.error(UNDECLARED_EXPERIMENT_WARNING)
             raise TemplateSyntaxError(UNDECLARED_EXPERIMENT_WARNING)
         return context[ctx_var].name
 
+@register.simple_tag(takes_context=True)
+def enrolled_variant_name(context, exp_name):
+    '''
+    Returns the enrolled variant's name
+    '''
+    ctx_var = CTX_PREFIX + exp_name
+    if ctx_var not in context:
+        logger.error(UNDECLARED_EXPERIMENT_WARNING)
+        raise TemplateSyntaxError(UNDECLARED_EXPERIMENT_WARNING)
+    return context[ctx_var].name
 
 @register.tag
 def experiment(parser, token):
@@ -165,9 +178,7 @@ def experiment(parser, token):
         logger.error(msg)
         raise TemplateSyntaxError(msg)
 
-    clean_exp_name = exp_name.strip("\"'")
-    clean_variants_str = variants_str.strip("\"'")
-    return ExperimentNode(clean_exp_name, clean_variants_str)
+    return ExperimentNode(exp_name, variants_str)
 
 
 @register.tag
@@ -175,7 +186,8 @@ def hyp(parser, token):
     """Return a :class:`HypNode` according to the contents of ``token``.
 
     Example::
-        {% hyp "signup_button" "blue" %}
+        {% with exp_name="home_signup" variant_name="blue" %}
+        {% hyp exp_name variant_name %}
 
     :param parser: template parser object
     :type parser: :class:`django.template.base.Parser`
@@ -199,9 +211,7 @@ def hyp(parser, token):
     node_list = parser.parse(("endhyp",))
     parser.next_token()
 
-    clean_exp_name = exp_name.strip("\"'")
-    clean_variant_name = exp_variant.strip("\"'")
-    return HypNode(clean_exp_name, clean_variant_name, node_list)
+    return HypNode(exp_name, exp_variant, node_list)
 
 
 # I couldn't make this work well. Probably needs much more thought to work like

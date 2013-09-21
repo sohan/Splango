@@ -1,5 +1,6 @@
 import logging
 import random
+import caching.base
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -186,7 +187,7 @@ class GoalRecord(models.Model):
         return u"%s by subject #%d" % (self.goal, self.subject_id)
 
 
-class Enrollment(models.Model):
+class Enrollment(caching.base.CachingMixin, models.Model):
 
     """Identifies which variant a subject is assigned to in a given
     experiment."""
@@ -201,6 +202,8 @@ class Enrollment(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     variant = models.ForeignKey('splango.Variant')
 
+    objects = caching.base.CachingManager()
+
     class Meta:
         unique_together = (('subject', 'experiment'),)
 
@@ -209,7 +212,7 @@ class Enrollment(models.Model):
                 (self.experiment.name, self.subject_id, self.variant))
 
 
-class Experiment(models.Model):
+class Experiment(caching.base.CachingMixin, models.Model):
 
     """A named experiment.
 
@@ -220,6 +223,8 @@ class Experiment(models.Model):
 
     name = models.CharField(max_length=_NAME_LENGTH, primary_key=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    objects = caching.base.CachingManager()
 
     # moved to variant, variant has the experiment
     # subjects = models.ManyToManyField(Subject, through=Enrollment)
@@ -388,7 +393,7 @@ class ExperimentReport(models.Model):
         return result
 
 
-class Variant(models.Model):
+class Variant(caching.base.CachingMixin, models.Model):
 
     """An Experiment Variant, with optional weight
 
@@ -400,6 +405,7 @@ class Variant(models.Model):
                                    related_name="variants")
 
     name = models.CharField(max_length=_NAME_LENGTH, blank=True)
+    objects = caching.base.CachingManager()
     # weight = models.IntegerField(null=True, blank=True,
     #                              help_text="The priority of the variant")
 

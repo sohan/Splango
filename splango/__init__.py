@@ -87,7 +87,6 @@ class RequestExperimentManager:
         return response
 
     def get_subject(self):
-
         sezzion = self.request.session
         subject = sezzion.get(SPLANGO_SUBJECT)
         if not subject:  # TODO: shouldn't this be ``if subject is None``?
@@ -108,7 +107,12 @@ class RequestExperimentManager:
         exp = Experiment.declare(exp_name, variants)
 
         subject = self.get_subject()
-        subject_variant = exp.get_or_create_enrollment(subject, variant=selected_variant)
+        selected_variant_obj = None
+        if selected_variant:
+            selected_variant_obj, created = Variant.objects.get_or_create(
+                    name=selected_variant,
+                    experiment=exp)
+        subject_variant = exp.get_or_create_enrollment(subject, variant=selected_variant_obj)
         variant = subject_variant.variant
         logger.info("got variant %s for subject %s" %
                     (str(variant), str(subject)))
